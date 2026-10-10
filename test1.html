@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inter-School Quiz & Flashcards</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text: #0f172a;
+            --text-light: #64748b;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: var(--surface);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        h1, h2, h3 { text-align: center; margin-top: 0; }
+        .hidden { display: none !important; }
+
+        #progress-bar {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        #progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .question-header { font-size: 1.1rem; font-weight: 600; margin-bottom: 20px; }
+        .options-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        
+        .option-label {
+            display: flex; align-items: center; padding: 12px 16px;
+            border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.2s;
+        }
+        .option-label:hover { background-color: #f1f5f9; }
+        .option-label.correct-bg { background-color: #dcfce7; border-color: var(--success); }
+        .option-label.incorrect-bg { background-color: #fee2e2; border-color: var(--danger); }
+        .option-label input { margin-right: 12px; transform: scale(1.2); }
+        
+        .btn {
+            background-color: var(--primary); color: white; border: none;
+            padding: 12px 24px; border-radius: 6px; font-size: 1rem;
+            font-weight: 600; cursor: pointer; transition: background 0.2s;
+            width: 100%; margin-bottom: 10px;
+        }
+        .btn:hover { background-color: var(--primary-hover); }
+        .btn-outline { background-color: transparent; color: var(--primary); border: 2px solid var(--primary); }
+        .btn-outline:hover { background-color: #eff6ff; }
+        
+        .explanation {
+            background: #f1f5f9; padding: 15px; border-radius: 8px;
+            margin-bottom: 20px; font-size: 0.95rem; border-left: 4px solid var(--primary);
+        }
+
+        .flashcard-container { perspective: 1000px; width: 100%; height: 300px; margin: 30px 0; cursor: pointer; }
+        .flashcard {
+            width: 100%; height: 100%; position: relative; transition: transform 0.6s;
+            transform-style: preserve-3d; border-radius: 12px; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+        .flashcard.is-flipped { transform: rotateY(180deg); }
+        .card-face {
+            position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+            display: flex; align-items: center; justify-content: center; padding: 20px;
+            box-sizing: border-box; border-radius: 12px; font-size: 1.25rem; text-align: center;
+        }
+        .card-front { background-color: var(--primary); color: white; }
+        .card-back { background-color: var(--surface); color: var(--text); border: 2px solid var(--primary); transform: rotateY(180deg); }
+        .flashcard-controls { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .flashcard-controls button { width: auto; flex: 1; }
+        .instruction { text-align: center; color: var(--text-light); font-size: 0.85rem; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="quiz-section">
+        <h2 id="round-title">Quiz Championship</h2>
+        <div id="progress-bar"><div id="progress-fill"></div></div>
+        
+        <div id="quiz-content">
+            <div class="question-header" id="question-text">Loading question...</div>
+            <div class="instruction" id="question-instruction"></div>
+            <div class="options-grid" id="options-container"></div>
+            <div id="explanation-box" class="explanation hidden"></div>
+            
+            <button id="submit-btn" class="btn" onclick="submitAnswer()">Submit Answer</button>
+            <button id="show-answer-btn" class="btn btn-outline" onclick="showAnswer()">Show Answer & Explanation</button>
+            <button id="next-btn" class="btn hidden" onclick="nextQuestion()">Next Question</button>
+        </div>
+
+        <div id="quiz-results" class="hidden">
+            <h2>Quiz Complete!</h2>
+            <h1 id="final-score">0 / 30</h1>
+            <p style="text-align: center; margin-bottom: 30px;">Great job working through all 3 rounds.</p>
+            <button class="btn" onclick="startFlashcards()">Proceed to Topic Facts Flashcards</button>
+        </div>
+    </div>
+
+    <div id="flashcard-section" class="hidden">
+        <h2>Topic Facts Flashcards</h2>
+        <p class="instruction">Click or tap the card to flip between the Topic and the Fact.</p>
+        
+        <div class="flashcard-container" onclick="flipCard()">
+            <div class="flashcard" id="flashcard">
+                <div class="card-face card-front" id="card-front">Topic</div>
+                <div class="card-face card-back" id="card-back">Fact</div>
+            </div>
+        </div>
+        <p style="text-align: center; font-weight: bold;" id="card-counter">1 / 15</p>
+        <div class="flashcard-controls">
+            <button class="btn btn-outline" onclick="prevCard()">Previous</button>
+            <button class="btn btn-outline" onclick="nextCard()">Next</button>
+        </div>
+        <a href="index.html"><button class="btn" style="margin-top: 20px;">Back to Main Menu</button></a>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        { round: "Round 1", text: "Which Indian scientist won the 1930 Nobel Prize in Physics for his work on the scattering of light?", type: "single", options: ["C. V. Raman", "Homi J. Bhabha", "Satyendra Nath Bose", "Meghnad Saha"], correct: [0], exp: "C. V. Raman discovered the Raman Effect concerning the scattering of light." },
+        { round: "Round 1", text: "Which river is traditionally regarded as the longest river flowing entirely within India?", type: "single", options: ["Narmada", "Mahanadi", "Godavari", "Krishna"], correct: [2], exp: "The Godavari is the longest river situated entirely within India's borders." },
+        { round: "Round 1", text: "In a right-angled triangle, the two shorter sides measure 6 cm and 8 cm. What is the hypotenuse?", type: "single", options: ["9 cm", "10 cm", "14 cm", "12 cm"], correct: [1], exp: "Using Pythagoras theorem: √(6² + 8²) = √(36 + 64) = √100 = 10 cm." },
+        { round: "Round 1", text: "Who wrote the novel 'The Guide', which won the Sahitya Akademi Award in 1960?", type: "single", options: ["R. K. Narayan", "Mulk Raj Anand", "Vikram Seth", "Khushwant Singh"], correct: [0], exp: "R. K. Narayan is the author of 'The Guide', a classic of Indian literature." },
+        { round: "Round 1", text: "Which TWO of these are greenhouse gases that contribute to Earth's warming? Select every correct answer.", type: "multi", options: ["Argon", "Carbon dioxide", "Neon", "Methane"], correct: [1, 3], exp: "Carbon dioxide and Methane are primary greenhouse gases that trap heat in the atmosphere." },
+        { round: "Round 1", text: "Which instrument is most closely associated with Pandit Ravi Shankar?", type: "single", options: ["Santoor", "Sarod", "Shehnai", "Sitar"], correct: [3], exp: "Pandit Ravi Shankar was a world-renowned sitar maestro." },
+        { round: "Round 1", text: "Which layer of Earth's atmosphere contains most of the ozone layer?", type: "single", options: ["Thermosphere", "Troposphere", "Mesosphere", "Stratosphere"], correct: [3], exp: "The ozone layer is primarily located within the Earth's stratosphere." },
+        { round: "Round 1", text: "The SI unit of electric resistance is the ohm, named after physicist Georg Simon Ohm.", type: "single", options: ["True", "False"], correct: [0], exp: "True. Georg Simon Ohm is the physicist behind Ohm's Law." },
+        { round: "Round 1", text: "Which international organisation publishes the annual World Economic Outlook report?", type: "single", options: ["World Bank", "World Trade Organization", "United Nations Development Programme", "International Monetary Fund"], correct: [3], exp: "The International Monetary Fund (IMF) publishes the World Economic Outlook." },
+        { round: "Round 1", text: "The Pacific Ocean is smaller in area than the Atlantic Ocean.", type: "single", options: ["True", "False"], correct: [1], exp: "False. The Pacific Ocean is the largest ocean on Earth." },
+        { round: "Round 2", text: "Which article of the Constitution of India is known for abolishing untouchability?", type: "single", options: ["Article 21", "Article 14", "Article 17", "Article 19"], correct: [2], exp: "Article 17 of the Indian Constitution abolished untouchability." },
+        { round: "Round 2", text: "Which Indian space mission made India the first country to land near the Moon's south polar region in August 2023?", type: "single", options: ["Aditya-L1", "Chandrayaan-2", "Mangalyaan", "Chandrayaan-3"], correct: [3], exp: "Chandrayaan-3 successfully touched down near the lunar south pole." },
+        { round: "Round 2", text: "A shopkeeper marks an item at ₹1,000 and gives a 20% discount. What is the selling price before any taxes?", type: "single", options: ["₹820", "₹800", "₹700", "₹750"], correct: [1], exp: "20% of 1000 is 200. 1000 - 200 = ₹800." },
+        { round: "Round 2", text: "Which element has the chemical symbol W?", type: "single", options: ["Tin", "Tantalum", "Tungsten", "Vanadium"], correct: [2], exp: "W stands for Wolfram, the alternate name for Tungsten." },
+        { round: "Round 2", text: "Who wrote the Bengali novel 'Anandamath', which includes the song 'Vande Mataram'?", type: "single", options: ["Rabindranath Tagore", "Bankim Chandra Chattopadhyay", "Kazi Nazrul Islam", "Sarat Chandra Chattopadhyay"], correct: [1], exp: "Bankim Chandra Chattopadhyay authored 'Anandamath'." },
+        { round: "Round 2", text: "Which classical Indian dance form originated in Kerala and traditionally features elaborate makeup and stylised facial expressions?", type: "single", options: ["Kathakali", "Kathak", "Odissi", "Bharatanatyam"], correct: [0], exp: "Kathakali is renowned for its elaborate makeup, costumes, and facial expressions." },
+        { round: "Round 2", text: "Which strait separates India and Sri Lanka?", type: "single", options: ["Malacca Strait", "Bering Strait", "Hormuz Strait", "Palk Strait"], correct: [3], exp: "The Palk Strait separates the Tamil Nadu state of India and Sri Lanka." },
+        { round: "Round 2", text: "Which TWO international agreements are directly associated with protecting the ozone layer or controlling substances that deplete it? Select every correct answer.", type: "multi", options: ["Vienna Convention", "Montreal Protocol", "Ramsar Convention", "Kyoto Protocol"], correct: [0, 1], exp: "The Vienna Convention and its Montreal Protocol are dedicated to protecting the ozone layer." },
+        { round: "Round 2", text: "The Nobel Prize in Literature has been awarded to a recipient writing in a language other than English.", type: "single", options: ["True", "False"], correct: [0], exp: "True. Many non-English writers (like Rabindranath Tagore) have won the prize." },
+        { round: "Round 2", text: "Which country hosted the 2024 United Nations Biodiversity Conference (COP16) in Cali?", type: "single", options: ["Colombia", "United Arab Emirates", "Azerbaijan", "Brazil"], correct: [0], exp: "Colombia was the host nation for COP16 in the city of Cali." },
+        { round: "Round 3", text: "Which schedule of the Constitution of India lists the officially recognised languages?", type: "single", options: ["Seventh Schedule", "Fifth Schedule", "Eighth Schedule", "Tenth Schedule"], correct: [2], exp: "The Eighth Schedule contains the list of officially recognised languages in India." },
+        { round: "Round 3", text: "Which scientist formulated the three laws of planetary motion that describe how planets orbit the Sun?", type: "single", options: ["Galileo Galilei", "Johannes Kepler", "Edwin Hubble", "Nicolaus Copernicus"], correct: [1], exp: "Johannes Kepler formulated the definitive laws of planetary motion." },
+        { round: "Round 3", text: "What is the smallest positive integer that is divisible by both 12 and 18?", type: "single", options: ["72", "30", "24", "36"], correct: [3], exp: "The Lowest Common Multiple (LCM) of 12 and 18 is 36." },
+        { round: "Round 3", text: "Which Indian-born author wrote the novel 'The Inheritance of Loss', which won the 2006 Man Booker Prize?", type: "single", options: ["Arundhati Roy", "Anita Desai", "Kiran Desai", "Jhumpa Lahiri"], correct: [2], exp: "Kiran Desai authored 'The Inheritance of Loss'." },
+        { round: "Round 3", text: "Which raga is traditionally associated with the monsoon season in Hindustani classical music?", type: "single", options: ["Raga Bhupali", "Raga Malhar", "Raga Bhairav", "Raga Yaman"], correct: [1], exp: "Raga Malhar (or Miyan Malhar) is deeply associated with the monsoon rains." },
+        { round: "Round 3", text: "Which country has the greatest number of natural lakes, according to commonly cited geographical estimates?", type: "single", options: ["Finland", "Russia", "United States", "Canada"], correct: [3], exp: "Canada is home to more than half of the world's natural lakes." },
+        { round: "Round 3", text: "Which TWO of these are recognised Ramsar wetlands in India? Select every correct answer.", type: "multi", options: ["Hemis National Park", "Keoladeo National Park", "Chilika Lake", "Gir National Park"], correct: [1, 2], exp: "Keoladeo National Park and Chilika Lake are both critical Ramsar wetlands." },
+        { round: "Round 3", text: "Which element is the most abundant by mass in Earth's crust?", type: "single", options: ["Oxygen", "Iron", "Aluminium", "Silicon"], correct: [0], exp: "Oxygen makes up nearly 47% of the Earth's crust by mass." },
+        { round: "Round 3", text: "The 2025 Nobel Prize in Physics was awarded for discoveries related to macroscopic quantum mechanical tunnelling and energy quantisation in an electric circuit.", type: "single", options: ["True", "False"], correct: [0], exp: "True. This reflects the landmark discoveries in quantum circuitry." },
+        { round: "Round 3", text: "Which country held the G20 presidency and hosted the G20 Leaders' Summit in 2025?", type: "single", options: ["Brazil", "Indonesia", "South Africa", "India"], correct: [2], exp: "South Africa assumed the G20 presidency for the year 2025." }
+    ];
+
+    const flashcardsData = [
+        { topic: "Indian Constitution Adopted on", fact: "26 November 1949" },
+        { topic: "Constitution in force", fact: "26 January 1950" },
+        { topic: "India's first satellite", fact: "Aryabhata" },
+        { topic: "India's first woman in space", fact: "Kalpana Chawla" },
+        { topic: "Human body's largest organ", fact: "Skin" },
+        { topic: "Vitamin made with sunlight exposure", fact: "Vitamin D" },
+        { topic: "SI unit of force", fact: "Newton" },
+        { topic: "Largest planet", fact: "Jupiter" },
+        { topic: "Largest hot desert", fact: "Sahara" },
+        { topic: "Highest mountain above sea level", fact: "Mount Everest" },
+        { topic: "Author of The Jungle Book", fact: "Rudyard Kipling" },
+        { topic: "Author of Gitanjali", fact: "Rabindranath Tagore" },
+        { topic: "India's national aquatic animal", fact: "Ganges river dolphin" },
+        { topic: "World Environment Day", fact: "5 June" },
+        { topic: "International Mother Language Day", fact: "21 February" }
+    ];
+
+    let currentQ = 0; let score = 0; let currentFact = 0; let answered = false;
+
+    const qTitle = document.getElementById("round-title");
+    const qText = document.getElementById("question-text");
+    const qInst = document.getElementById("question-instruction");
+    const optionsContainer = document.getElementById("options-container");
+    const expBox = document.getElementById("explanation-box");
+    const submitBtn = document.getElementById("submit-btn");
+    const showAnsBtn = document.getElementById("show-answer-btn");
+    const nextBtn = document.getElementById("next-btn");
+    const progressFill = document.getElementById("progress-fill");
+
+    function loadQuestion() {
+        answered = false;
+        const q = quizData[currentQ];
+        qTitle.innerText = `${q.round} (Question ${currentQ + 1} of ${quizData.length})`;
+        qText.innerText = q.text;
+        qInst.innerText = q.type === "multi" ? "Select multiple answers:" : "Select one answer:";
+        progressFill.style.width = `${((currentQ) / quizData.length) * 100}%`;
+        optionsContainer.innerHTML = "";
+        expBox.classList.add("hidden");
+        expBox.innerHTML = `<strong>Explanation:</strong> ${q.exp}`;
+        submitBtn.classList.remove("hidden");
+        showAnsBtn.classList.remove("hidden");
+        nextBtn.classList.add("hidden");
+
+        q.options.forEach((opt, index) => {
+            const label = document.createElement("label"); label.className = "option-label"; label.id = `label-${index}`;
+            const input = document.createElement("input");
+            input.type = q.type === "multi" ? "checkbox" : "radio";
+            input.name = "quiz-option"; input.value = index;
+            label.appendChild(input); label.appendChild(document.createTextNode(opt));
+            optionsContainer.appendChild(label);
+        });
+    }
+
+    function getSelected() {
+        const inputs = document.querySelectorAll('input[name="quiz-option"]:checked');
+        return Array.from(inputs).map(i => parseInt(i.value));
+    }
+
+    function checkAnswer(revealOnly = false) {
+        if (answered) return;
+        answered = true;
+        document.querySelectorAll('input[name="quiz-option"]').forEach(i => i.disabled = true);
+        const q = quizData[currentQ]; const selected = getSelected();
+        const isCorrect = JSON.stringify(selected.sort()) === JSON.stringify(q.correct.sort());
+
+        if (!revealOnly && isCorrect) score++;
+
+        q.options.forEach((_, i) => {
+            const lbl = document.getElementById(`label-${i}`);
+            if (q.correct.includes(i)) lbl.classList.add("correct-bg");
+            else if (selected.includes(i)) lbl.classList.add("incorrect-bg");
+        });
+
+        expBox.classList.remove("hidden"); submitBtn.classList.add("hidden");
+        showAnsBtn.classList.add("hidden"); nextBtn.classList.remove("hidden");
+    }
+
+    function submitAnswer() {
+        if (getSelected().length === 0) { alert("Please select an answer first."); return; }
+        checkAnswer(false);
+    }
+    function showAnswer() { checkAnswer(true); }
+
+    function nextQuestion() {
+        currentQ++;
+        if (currentQ < quizData.length) loadQuestion();
+        else {
+            document.getElementById("quiz-content").classList.add("hidden");
+            document.getElementById("progress-bar").classList.add("hidden");
+            document.getElementById("round-title").classList.add("hidden");
+            document.getElementById("quiz-results").classList.remove("hidden");
+            document.getElementById("final-score").innerText = `${score} / ${quizData.length}`;
+        }
+    }
+
+    function startFlashcards() {
+        document.getElementById("quiz-section").classList.add("hidden");
+        document.getElementById("flashcard-section").classList.remove("hidden");
+        loadFact();
+    }
+
+    function loadFact() {
+        const f = flashcardsData[currentFact];
+        document.getElementById("card-front").innerText = f.topic; document.getElementById("card-back").innerText = f.fact;
+        document.getElementById("card-counter").innerText = `${currentFact + 1} / ${flashcardsData.length}`;
+        document.getElementById("flashcard").classList.remove("is-flipped");
+    }
+
+    function flipCard() { document.getElementById("flashcard").classList.toggle("is-flipped"); }
+    function nextCard() { currentFact = (currentFact + 1) % flashcardsData.length; loadFact(); }
+    function prevCard() { currentFact = (currentFact - 1 + flashcardsData.length) % flashcardsData.length; loadFact(); }
+
+    loadQuestion();
+</script>
+</body>
+</html>
