@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>General Knowledge - Test 2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary-color: #4a90e2; --bg-gradient-start: #f5f7fa; --bg-gradient-end: #c3cfe2; --text-dark: #2c3e50; --card-bg: rgba(255, 255, 255, 0.95); --correct-color: #27ae60; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%); min-height: 100vh; padding: 40px 20px; color: var(--text-dark); }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 { font-size: 2.5rem; color: var(--primary-color); }
+        .btn-back { display: inline-block; margin-bottom: 20px; text-decoration: none; color: var(--text-dark); border: 2px solid #cbd5e1; padding: 8px 20px; border-radius: 20px; transition: all 0.3s; }
+        .btn-back:hover { background: var(--text-dark); color: white; }
+        .q-card { background: var(--card-bg); border-radius: 15px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .q-text { font-size: 1.2rem; font-weight: 600; margin-bottom: 15px; }
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        .opt-btn { text-align: left; padding: 12px 20px; border: 1px solid #e2e8f0; border-radius: 10px; background: white; cursor: pointer; transition: 0.2s; font-size: 1rem; }
+        .opt-btn:hover { border-color: var(--primary-color); background: #f0f7ff; }
+        .explanation { display: none; margin-top: 15px; padding: 15px; background: #e8f5e9; border-left: 4px solid var(--correct-color); border-radius: 4px; color: #1b5e20; }
+        .explanation.show { display: block; animation: fadeIn 0.4s; }
+        .flashcards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 40px; }
+        .flashcard { background: transparent; perspective: 1000px; height: 150px; cursor: pointer; }
+        .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .flashcard-front { background: var(--primary-color); color: white; font-weight: 500; }
+        .flashcard-back { background: var(--correct-color); color: white; transform: rotateY(180deg); font-size: 0.95rem; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="btn-back">← Back to Portal</a>
+        <div class="header">
+            <h1>Test 2: General Knowledge</h1>
+        </div>
+        <div id="quiz-feed"></div>
+        <div class="header" style="margin-top: 50px;">
+            <h2>Quick-Revision Flashcards</h2>
+        </div>
+        <div class="flashcards-grid" id="fc-feed"></div>
+    </div>
+    <script>
+        const data = [
+            {q: '1. Which treaty formally ended the state of war between Germany and the Allied Powers after World War I?', opts: ['A. Treaty of Utrecht', 'B. Treaty of Versailles', 'C. Treaty of Tordesillas', 'D. Treaty of Paris (1783)'], ans: 1, exp: 'The Treaty of Versailles was signed in 1919.[span_26](start_span)[span_26](end_span)'},
+            {q: '2. Which Indian ruler is associated with the construction of the Grand Trunk Road in its major medieval form?', opts: ['A. Akbar', 'B. Sher Shah Suri', 'C. Alauddin Khalji', 'D. Chandragupta Maurya'], ans: 1, exp: 'Sher Shah Suri improved and extended the road network that became the Grand Trunk Road.[span_27](start_span)[span_27](end_span)'},
+            {q: '3. Which strait separates Asia from North America?', opts: ['A. Strait of Malacca', 'B. Bering Strait', 'C. Strait of Gibraltar', 'D. Bosporus'], ans: 1, exp: 'The Bering Strait lies between Russia and Alaska.[span_28](start_span)[span_28](end_span)'},
+            {q: '4. Who was the first Secretary-General of the United Nations?', opts: ['A. Dag Hammarskjöld', 'B. Trygve Lie', 'C. U Thant', 'D. Kurt Waldheim'], ans: 1, exp: 'Norwegian diplomat Trygve Lie served from 1946 to 1952.[span_29](start_span)[span_29](end_span)'},
+            {q: '5. The "Blue Economy" mainly concerns the sustainable use of which environment?', opts: ['A. Deserts', 'B. Oceans and coastal resources', 'C. Mountain forests', 'D. Polar ice sheets'], ans: 1, exp: 'The Blue Economy focuses on sustainable ocean-based economic activity.[span_30](start_span)[span_30](end_span)'},
+            {q: '6. Which Indian mathematician is associated with the number 1729 and the Hardy-Ramanujan story?', opts: ['A. Aryabhata', 'B. Srinivasa Ramanujan', 'C. Bhaskara II', 'D. Brahmagupta'], ans: 1, exp: '1729 is known as the Hardy-Ramanujan number.[span_31](start_span)[span_31](end_span)'},
+            {q: '7. Which country was formerly known as Abyssinia?', opts: ['A. Eritrea', 'B. Ethiopia', 'C. Somalia', 'D. Sudan'], ans: 1, exp: 'Abyssinia was a historical name for Ethiopia.[span_32](start_span)[span_32](end_span)'},
+            {q: '8. Which Indian city is widely known as the "Pink City"?', opts: ['A. Jodhpur', 'B. Jaipur', 'C. Udaipur', 'D. Bikaner'], ans: 1, exp: 'Jaipur is commonly called the Pink City.[span_33](start_span)[span_33](end_span)'},
+            {q: '9. What is the name of the world\'s largest coral reef system?', opts: ['A. Belize Barrier Reef', 'B. Great Barrier Reef', 'C. Red Sea Reef', 'D. New Caledonia Barrier Reef'], ans: 1, exp: 'The Great Barrier Reef lies off Queensland, Australia.[span_34](start_span)[span_34](end_span)'},
+            {q: '10. Which philosopher was the teacher of Alexander the Great?', opts: ['A. Socrates', 'B. Aristotle', 'C. Plato', 'D. Pythagoras'], ans: 1, exp: 'Aristotle tutored Alexander during his youth.[span_35](start_span)[span_35](end_span)'},
+            {q: '11. Which Indian constitutional article abolishes untouchability?', opts: ['A. Article 14', 'B. Article 17', 'C. Article 19', 'D. Article 21'], ans: 1, exp: 'Article 17 abolishes untouchability.[span_36](start_span)[span_36](end_span)'},
+            {q: '12. Which country has the city of Samarkand, a historic Silk Road centre?', opts: ['A. Uzbekistan', 'B. Mongolia', 'C. Iran', 'D. Nepal'], ans: 0, exp: 'Samarkand is in Uzbekistan.[span_37](start_span)[span_37](end_span)'},
+            {q: '13. Which is the smallest independent country in the world by area?', opts: ['A. Monaco', 'B. San Marino', 'C. Vatican City', 'D. Liechtenstein'], ans: 2, exp: 'Vatican City is the world\'s smallest sovereign state by area.[span_38](start_span)[span_38](end_span)'},
+            {q: '14. Who was the first Indian woman to win an Olympic medal?', opts: ['A. P. T. Usha', 'B. Karnam Malleswari', 'C. Mary Kom', 'D. Saina Nehwal'], ans: 1, exp: 'Karnam Malleswari won bronze in weightlifting at the 2000 Sydney Olympics.[span_39](start_span)[span_39](end_span)'},
+            {q: '15. Which instrument measures atmospheric pressure?', opts: ['A. Hygrometer', 'B. Barometer', 'C. Anemometer', 'D. Seismograph'], ans: 1, exp: 'A barometer measures atmospheric pressure.[span_40](start_span)[span_40](end_span)'},
+            {q: '16. The ancient library of Alexandria was located in which country?', opts: ['A. Greece', 'B. Egypt', 'C. Turkey', 'D. Italy'], ans: 1, exp: 'Alexandria is a Mediterranean port city in Egypt.[span_41](start_span)[span_41](end_span)'},
+            {q: '17. Which Indian state has the largest area?', opts: ['A. Madhya Pradesh', 'B. Maharashtra', 'C. Rajasthan', 'D. Uttar Pradesh'], ans: 2, exp: 'Rajasthan is India\'s largest state by area.[span_42](start_span)[span_42](end_span)'},
+            {q: '18. Which organisation administers the Nobel Peace Prize?', opts: ['A. Swedish Academy', 'B. Norwegian Nobel Committee', 'C. UNESCO', 'D. European Parliament'], ans: 1, exp: 'The Norwegian Nobel Committee awards the Nobel Peace Prize.[span_43](start_span)[span_43](end_span)'},
+            {q: '19. What is the study of flags called?', opts: ['A. Numismatics', 'B. Vexillology', 'C. Heraldry', 'D. Paleography'], ans: 1, exp: 'Vexillology is the study of flags.[span_44](start_span)[span_44](end_span)'},
+            {q: '20. Which river flows through Baghdad?', opts: ['A. Nile', 'B. Tigris', 'C. Jordan', 'D. Euphrates only'], ans: 1, exp: 'The Tigris flows through Baghdad; the Euphrates flows west of the city.[span_45](start_span)[span_45](end_span)'}
+        ];
+        const flashcards = [
+            {q: 'What is the capital of Bhutan?', a: 'Thimphu.[span_46](start_span)[span_46](end_span)'},
+            {q: 'Who founded the Maurya Empire?', a: 'Chandragupta Maurya.[span_47](start_span)[span_47](end_span)'},
+            {q: 'Which gas is commonly called laughing gas?', a: 'Nitrous oxide (N2O).[span_48](start_span)[span_48](end_span)'},
+            {q: 'What is the official residence of the President of India?', a: 'Rashtrapati Bhavan, New Delhi.[span_49](start_span)[span_49](end_span)'},
+            {q: 'Which is the deepest known ocean trench?', a: 'The Mariana Trench in the western Pacific Ocean.[span_50](start_span)[span_50](end_span)'}
+        ];
+
+        const feed = document.getElementById('quiz-feed');
+        data.forEach((item, index) => {
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            let optsHtml = item.opts.map((opt) => `<button class="opt-btn" onclick="reveal(${index})">${opt}</button>`).join('');
+            card.innerHTML = `<div class="q-text">${item.q}</div><div class="options">${optsHtml}</div><div class="explanation" id="exp-${index}"><strong>Correct Answer: ${item.opts[item.ans]}</strong><br><br>${item.exp}</div>`;
+            feed.appendChild(card);
+        });
+
+        const fcFeed = document.getElementById('fc-feed');
+        flashcards.forEach((fc) => {
+            fcFeed.innerHTML += `<div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner"><div class="flashcard-front">${fc.q}</div><div class="flashcard-back">${fc.a}</div></div></div>`;
+        });
+        function reveal(id) { document.getElementById(`exp-${id}`).classList.add('show'); }
+    </script>
+</body>
+</html>
