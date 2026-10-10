@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Science - Test 3</title>
+    <style>
+        :root { --primary: #2563eb; --primary-hover: #1d4ed8; --success: #16a34a; --danger: #dc2626; --background: #f8fafc; --surface: #ffffff; --text: #0f172a; --text-light: #64748b; }
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--background); color: var(--text); line-height: 1.5; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { max-width: 650px; width: 100%; background: var(--surface); padding: 28px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        h1, h2, h3 { text-align: center; margin-top: 0; } .hidden { display: none !important; }
+        #progress-bar { height: 8px; background: #e2e8f0; border-radius: 4px; margin-bottom: 16px; overflow: hidden; }
+        #progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s ease; }
+        .palette-container { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0; }
+        .palette-title { font-size: 0.85rem; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; text-align: center; }
+        .palette-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(36px, 1fr)); gap: 6px; }
+        .palette-btn { border: 1px solid #cbd5e1; background: #f8fafc; color: var(--text); padding: 6px 0; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.15s ease; }
+        .palette-btn:hover { background: #e2e8f0; } .palette-btn.active { border: 2px solid var(--primary); color: var(--primary); font-weight: 700; }
+        .palette-btn.answered { background-color: var(--primary); color: white; border-color: var(--primary); }
+        .palette-btn.active.answered { outline: 2px solid #0f172a; outline-offset: 1px; }
+        .question-header { font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; }
+        .options-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .option-label { display: flex; align-items: center; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .option-label:hover { background-color: #f1f5f9; } .option-label.correct-bg { background-color: #dcfce7; border-color: var(--success); } .option-label.incorrect-bg { background-color: #fee2e2; border-color: var(--danger); }
+        .option-label input { margin-right: 12px; transform: scale(1.2); }
+        .btn { background-color: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s; width: 100%; margin-bottom: 10px; }
+        .btn:hover { background-color: var(--primary-hover); } .btn-outline { background-color: transparent; color: var(--primary); border: 2px solid var(--primary); } .btn-outline:hover { background-color: #eff6ff; } .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+        .explanation { background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.95rem; border-left: 4px solid var(--primary); }
+        .nav-controls { display: flex; gap: 10px; margin-top: 15px; border-top: 1px solid #e2e8f0; padding-top: 15px; } .nav-controls .btn { margin-bottom: 0; flex: 1; }
+        .flashcard-container { perspective: 1000px; width: 100%; height: 300px; margin: 30px 0; cursor: pointer; }
+        .flashcard { width: 100%; height: 100%; position: relative; transition: transform 0.6s; transform-style: preserve-3d; border-radius: 12px; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); }
+        .flashcard.is-flipped { transform: rotateY(180deg); }
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; border-radius: 12px; font-size: 1.25rem; text-align: center; }
+        .card-front { background-color: var(--primary); color: white; } .card-back { background-color: var(--surface); color: var(--text); border: 2px solid var(--primary); transform: rotateY(180deg); }
+        .flashcard-controls { display: flex; justify-content: space-between; align-items: center; gap: 10px; } .flashcard-controls button { width: auto; flex: 1; }
+        .instruction { text-align: center; color: var(--text-light); font-size: 0.85rem; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="quiz-section">
+        <h2 id="round-title">Science: Test 3 (Biology)</h2>
+        <div id="progress-bar"><div id="progress-fill"></div></div>
+        <div class="palette-container"><div class="palette-title">Question Navigator</div><div class="palette-grid" id="palette-grid"></div></div>
+        <div id="quiz-content">
+            <div class="question-header" id="question-text">Loading question...</div>
+            <div class="instruction" id="question-instruction"></div>
+            <div class="options-grid" id="options-container"></div>
+            <div id="explanation-box" class="explanation hidden"></div>
+            <button id="submit-btn" class="btn" onclick="submitAnswer()">Submit Answer</button>
+            <button id="show-answer-btn" class="btn btn-outline" onclick="showAnswer()">Show Answer & Explanation</button>
+            <div class="nav-controls">
+                <button id="prev-btn" class="btn btn-outline" onclick="prevQuestion()">← Previous</button>
+                <button id="finish-btn" class="btn btn-outline" style="background:#16a34a;color:white;border-color:#16a34a;" onclick="finishQuiz()">Finish Quiz</button>
+                <button id="next-btn" class="btn btn-outline" onclick="nextQuestion()">Next →</button>
+            </div>
+        </div>
+        <div id="quiz-results" class="hidden">
+            <h2>Quiz Complete!</h2>
+            <h1 id="final-score">0 / 20</h1>
+            <p style="text-align: center; margin-bottom: 25px;">Review finished! Proceed below to study the high-yield facts.</p>
+            <button class="btn" onclick="startFlashcards()">Proceed to Topic Facts Flashcards</button>
+            <button class="btn btn-outline" onclick="reviewQuestions()">Review Questions</button>
+        </div>
+    </div>
+    <div id="flashcard-section" class="hidden">
+        <h2>Topic Facts Flashcards</h2>
+        <p class="instruction">Click or tap the card to flip between the Topic and the Fact.</p>
+        <div class="flashcard-container" onclick="flipCard()"><div class="flashcard" id="flashcard"><div class="card-face card-front" id="card-front">Topic</div><div class="card-face card-back" id="card-back">Fact</div></div></div>
+        <p style="text-align: center; font-weight: bold;" id="card-counter">1 / 5</p>
+        <div class="flashcard-controls">
+            <button class="btn btn-outline" onclick="prevCard()">Previous</button>
+            <button class="btn btn-outline" onclick="nextCard()">Next</button>
+        </div>
+        <a href="index.html" style="text-decoration:none;"><button class="btn" style="margin-top: 20px;">Back to Main Menu</button></a>
+    </div>
+</div>
+<script>
+    const quizData = [
+        { round: "Test 3", text: "Which organelle is primarily responsible for producing ATP in aerobic respiration?", type: "single", options: ["Ribosome", "Mitochondrion", "Lysosome", "Golgi apparatus"], correct: [1], exp: "Mitochondria generate most cellular ATP during aerobic respiration, using energy released from nutrients.[span_50](start_span)[span_50](end_span)" },
+        { round: "Test 3", text: "Which structure controls many activities of a cell and contains most of its DNA?", type: "single", options: ["Cell wall", "Nucleus", "Vacuole", "Cytoplasm"], correct: [1], exp: "In eukaryotic cells, the nucleus contains chromosomes and regulates gene expression and many cell activities.[span_51](start_span)[span_51](end_span)" },
+        { round: "Test 3", text: "Which feature is characteristic of plant cells but absent from typical animal cells?", type: "single", options: ["Cell membrane", "Ribosomes", "Chloroplasts", "Cytoplasm"], correct: [2], exp: "Plant cells contain chloroplasts for photosynthesis. Both plant and animal cells have membranes, ribosomes and cytoplasm.[span_52](start_span)[span_52](end_span)" },
+        { round: "Test 3", text: "Photosynthesis converts light energy mainly into:", type: "single", options: ["Chemical energy stored in organic molecules", "Sound energy", "Nuclear energy", "Magnetic energy"], correct: [0], exp: "Photosynthesis uses light to build energy-rich molecules such as glucose from carbon dioxide and water.[span_53](start_span)[span_53](end_span)" },
+        { round: "Test 3", text: "Which gas is released as a major product of photosynthesis?", type: "single", options: ["Nitrogen", "Oxygen", "Methane", "Hydrogen"], correct: [1], exp: "During photosynthesis, water is split in the light-dependent reactions, releasing oxygen as a by-product.[span_54](start_span)[span_54](end_span)" },
+        { round: "Test 3", text: "Which blood component is mainly responsible for transporting oxygen?", type: "single", options: ["Platelets", "Red blood cells", "Plasma proteins only", "White blood cells"], correct: [1], exp: "Red blood cells contain haemoglobin, which binds oxygen and transports it through the bloodstream.[span_55](start_span)[span_55](end_span)" },
+        { round: "Test 3", text: "Which chamber of the human heart pumps oxygenated blood into the systemic circulation?", type: "single", options: ["Right atrium", "Right ventricle", "Left atrium", "Left ventricle"], correct: [3], exp: "The left ventricle pumps oxygenated blood through the aorta to the body. Its thick muscular wall generates high pressure.[span_56](start_span)[span_56](end_span)" },
+        { round: "Test 3", text: "Why are arteries generally thick-walled?", type: "single", options: ["They carry blood at relatively high pressure from the heart", "They always carry deoxygenated blood", "They contain valves throughout", "They carry lymph"], correct: [0], exp: "Arteries receive blood directly from the heart and therefore need strong, elastic walls to withstand higher pressure.[span_57](start_span)[span_57](end_span)" },
+        { round: "Test 3", text: "Which organ is the main site of nutrient absorption in the human digestive system?", type: "single", options: ["Stomach", "Small intestine", "Large intestine", "Oesophagus"], correct: [1], exp: "The small intestine has folds and villi that greatly increase surface area for absorption of digested nutrients.[span_58](start_span)[span_58](end_span)" },
+        { round: "Test 3", text: "Which enzyme begins the digestion of starch in the mouth?", type: "single", options: ["Pepsin", "Salivary amylase", "Trypsin", "Lipase from the pancreas"], correct: [1], exp: "Salivary amylase begins breaking starch into smaller carbohydrates while food is chewed and mixed with saliva.[span_59](start_span)[span_59](end_span)" },
+        { round: "Test 3", text: "Gas exchange in human lungs occurs mainly in the:", type: "single", options: ["Trachea", "Bronchi", "Alveoli", "Diaphragm"], correct: [2], exp: "Alveoli have thin walls and a rich blood supply, allowing oxygen and carbon dioxide to diffuse efficiently.[span_60](start_span)[span_60](end_span)" },
+        { round: "Test 3", text: "Which part of the nervous system coordinates balance and fine motor control?", type: "single", options: ["Cerebellum", "Medulla", "Spinal cord only", "Hypothalamus"], correct: [0], exp: "The cerebellum helps coordinate movement, posture and balance, making movements smooth and precise.[span_61](start_span)[span_61](end_span)" },
+        { round: "Test 3", text: "Vaccines primarily work by:", type: "single", options: ["Killing every pathogen instantly", "Training the immune system to recognize a pathogen or its components", "Replacing red blood cells", "Increasing body temperature permanently"], correct: [1], exp: "Vaccines stimulate adaptive immune memory, so a later encounter with the pathogen can trigger a faster, stronger response.[span_62](start_span)[span_62](end_span)" },
+        { round: "Test 3", text: "Which microorganism is used in bread-making to produce carbon dioxide?", type: "single", options: ["Yeast", "Plasmodium", "Amoeba", "Tapeworm"], correct: [0], exp: "Yeast ferments sugars and releases carbon dioxide. The gas becomes trapped in dough, helping bread rise.[span_63](start_span)[span_63](end_span)" },
+        { round: "Test 3", text: "Which disease is caused by a virus rather than a bacterium?", type: "single", options: ["Tuberculosis", "Cholera", "Influenza", "Typhoid"], correct: [2], exp: "Influenza is caused by influenza viruses. Tuberculosis, cholera and typhoid are bacterial diseases.[span_64](start_span)[span_64](end_span)" },
+        { round: "Test 3", text: "Which tissue transports water and mineral salts upward in a plant?", type: "single", options: ["Phloem", "Xylem", "Epidermis", "Meristem only"], correct: [1], exp: "Xylem conducts water and dissolved minerals mainly from roots toward shoots. Phloem transports sugars and other organic substances.[span_65](start_span)[span_65](end_span)" },
+        { round: "Test 3", text: "Which process in plants is most directly responsible for water loss from leaves?", type: "single", options: ["Germination", "Transpiration", "Pollination", "Respiration only"], correct: [1], exp: "Transpiration is the loss of water vapour, mainly through stomata in leaves.[span_66](start_span)[span_66](end_span)" },
+        { round: "Test 3", text: "Which classification group contains organisms with cells that lack a membrane-bound nucleus?", type: "single", options: ["Prokaryotes", "Fungi only", "Animals", "Plants"], correct: [0], exp: "Prokaryotic cells, such as bacteria and archaea, do not have a membrane-bound nucleus.[span_67](start_span)[span_67](end_span)" },
+        { round: "Test 3", text: "Who is widely known for formulating the laws of inheritance from pea-plant experiments?", type: "single", options: ["Gregor Mendel", "Louis Pasteur", "Carl Linnaeus", "Robert Hooke"], correct: [0], exp: "Gregor Mendel studied pea plants and established key principles of heredity, including segregation of allele pairs.[span_68](start_span)[span_68](end_span)" },
+        { round: "Test 3", text: "Which scientist first observed and named 'cells' after examining cork under a microscope?", type: "single", options: ["Robert Hooke", "Charles Darwin", "Watson", "Alexander Fleming"], correct: [0], exp: "Robert Hooke described the small box-like structures in cork as 'cells' in 1665, using an early compound microscope.[span_69](start_span)[span_69](end_span)" }
+    ];
+
+    const flashcardsData = [
+        { topic: "Where does most nutrient absorption occur?", fact: "Small intestine, especially through its villi and microvilli.[span_70](start_span)[span_70](end_span)" },
+        { topic: "What is the role of vaccines?", fact: "They create immune memory so the body can respond faster to a pathogen." },
+        { topic: "What is xylem's main transport role?", fact: "It carries water and mineral ions mainly from roots toward shoots.[span_71](start_span)[span_71](end_span)" },
+        { topic: "What powers the Sun?", fact: "Nuclear fusion of hydrogen into helium in its core.[span_72](start_span)[span_72](end_span)" },
+        { topic: "What is a light-year?", fact: "A unit of distance: about 9.46 trillion km.[span_73](start_span)[span_73](end_span)" }
+    ];
+
+    const userAnswers = Array(quizData.length).fill(null).map(() => ({ selected: [], submitted: false, revealed: false, isCorrect: false }));
+    let currentQ = 0; let currentFact = 0;
+    const qTitle = document.getElementById("round-title"), qText = document.getElementById("question-text"), qInst = document.getElementById("question-instruction"), optionsContainer = document.getElementById("options-container"), expBox = document.getElementById("explanation-box"), submitBtn = document.getElementById("submit-btn"), showAnsBtn = document.getElementById("show-answer-btn"), prevBtn = document.getElementById("prev-btn"), nextBtn = document.getElementById("next-btn"), progressFill = document.getElementById("progress-fill"), paletteGrid = document.getElementById("palette-grid");
+
+    function initPalette() { paletteGrid.innerHTML = ""; quizData.forEach((_, idx) => { const btn = document.createElement("button"); btn.className = "palette-btn"; btn.id = `palette-btn-${idx}`; btn.innerText = idx + 1; btn.onclick = () => jumpToQuestion(idx); paletteGrid.appendChild(btn); }); }
+    function updatePalette() { quizData.forEach((_, idx) => { const btn = document.getElementById(`palette-btn-${idx}`); btn.classList.toggle("active", idx === currentQ); btn.classList.toggle("answered", userAnswers[idx].submitted || userAnswers[idx].revealed); }); }
+    function loadQuestion() { const q = quizData[currentQ]; const state = userAnswers[currentQ]; qTitle.innerText = `${q.round} (Question ${currentQ + 1} of ${quizData.length})`; qText.innerText = q.text; qInst.innerText = q.type === "multi" ? "Select multiple answers:" : "Select one answer:"; progressFill.style.width = `${(userAnswers.filter(a => a.submitted || a.revealed).length / quizData.length) * 100}%`; optionsContainer.innerHTML = ""; expBox.innerHTML = `<strong>Explanation:</strong> ${q.exp}`; prevBtn.disabled = (currentQ === 0); nextBtn.disabled = (currentQ === quizData.length - 1); q.options.forEach((opt, index) => { const label = document.createElement("label"); label.className = "option-label"; label.id = `label-${index}`; const input = document.createElement("input"); input.type = q.type === "multi" ? "checkbox" : "radio"; input.name = "quiz-option"; input.value = index; input.checked = state.selected.includes(index); input.disabled = (state.submitted || state.revealed); input.onchange = () => { state.selected = getSelectedInputs(); }; label.appendChild(input); label.appendChild(document.createTextNode(opt)); optionsContainer.appendChild(label); }); if (state.submitted || state.revealed) { highlightAnswers(); expBox.classList.remove("hidden"); submitBtn.classList.add("hidden"); showAnsBtn.classList.add("hidden"); } else { expBox.classList.add("hidden"); submitBtn.classList.remove("hidden"); showAnsBtn.classList.remove("hidden"); } updatePalette(); }
+    function getSelectedInputs() { return Array.from(document.querySelectorAll('input[name="quiz-option"]:checked')).map(i => parseInt(i.value)); }
+    function highlightAnswers() { const q = quizData[currentQ]; const state = userAnswers[currentQ]; q.options.forEach((_, i) => { const lbl = document.getElementById(`label-${i}`); if (q.correct.includes(i)) { lbl.classList.add("correct-bg"); } else if (state.selected.includes(i)) { lbl.classList.add("incorrect-bg"); } }); }
+    function lockQuestion(revealedOnly = false) { const q = quizData[currentQ]; const state = userAnswers[currentQ]; state.selected = getSelectedInputs(); if (revealedOnly) { state.revealed = true; state.isCorrect = false; } else { state.submitted = true; state.isCorrect = ([...q.correct].sort().join(",") === [...state.selected].sort().join(",")); } document.querySelectorAll('input[name="quiz-option"]').forEach(i => i.disabled = true); highlightAnswers(); expBox.classList.remove("hidden"); submitBtn.classList.add("hidden"); showAnsBtn.classList.add("hidden"); updatePalette(); progressFill.style.width = `${(userAnswers.filter(a => a.submitted || a.revealed).length / quizData.length) * 100}%`; }
+    function submitAnswer() { if (getSelectedInputs().length === 0) { alert("Please select an answer first."); return; } lockQuestion(false); }
+    function showAnswer() { lockQuestion(true); }
+    function jumpToQuestion(idx) { currentQ = idx; loadQuestion(); }
+    function nextQuestion() { if (currentQ < quizData.length - 1) { currentQ++; loadQuestion(); } }
+    function prevQuestion() { if (currentQ > 0) { currentQ--; loadQuestion(); } }
+    function finishQuiz() { document.getElementById("quiz-content").classList.add("hidden"); document.getElementById("progress-bar").classList.add("hidden"); document.getElementById("round-title").classList.add("hidden"); document.querySelector(".palette-container").classList.add("hidden"); document.getElementById("quiz-results").classList.remove("hidden"); document.getElementById("final-score").innerText = `${userAnswers.filter(a => a.isCorrect).length} / ${quizData.length}`; }
+    function reviewQuestions() { document.getElementById("quiz-results").classList.add("hidden"); document.getElementById("quiz-content").classList.remove("hidden"); document.getElementById("progress-bar").classList.remove("hidden"); document.getElementById("round-title").classList.remove("hidden"); document.querySelector(".palette-container").classList.remove("hidden"); currentQ = 0; loadQuestion(); }
+    function startFlashcards() { document.getElementById("quiz-section").classList.add("hidden"); document.getElementById("flashcard-section").classList.remove("hidden"); loadFact(); }
+    function loadFact() { const f = flashcardsData[currentFact]; document.getElementById("card-front").innerText = f.topic; document.getElementById("card-back").innerText = f.fact; document.getElementById("card-counter").innerText = `${currentFact + 1} / ${flashcardsData.length}`; document.getElementById("flashcard").classList.remove("is-flipped"); }
+    function flipCard() { document.getElementById("flashcard").classList.toggle("is-flipped"); }
+    function nextCard() { currentFact = (currentFact + 1) % flashcardsData.length; loadFact(); }
+    function prevCard() { currentFact = (currentFact - 1 + flashcardsData.length) % flashcardsData.length; loadFact(); }
+    initPalette(); loadQuestion();
+</script>
+</body>
+</html>
