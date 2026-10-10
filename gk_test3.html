@@ -4,90 +4,132 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>General Knowledge - Test 3</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary-color: #4a90e2; --bg-gradient-start: #f5f7fa; --bg-gradient-end: #c3cfe2; --text-dark: #2c3e50; --card-bg: rgba(255, 255, 255, 0.95); --correct-color: #27ae60; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%); min-height: 100vh; padding: 40px 20px; color: var(--text-dark); }
-        .container { max-width: 800px; margin: 0 auto; }
-        .header { text-align: center; margin-bottom: 40px; }
-        .header h1 { font-size: 2.5rem; color: var(--primary-color); }
-        .btn-back { display: inline-block; margin-bottom: 20px; text-decoration: none; color: var(--text-dark); border: 2px solid #cbd5e1; padding: 8px 20px; border-radius: 20px; transition: all 0.3s; }
-        .btn-back:hover { background: var(--text-dark); color: white; }
-        .q-card { background: var(--card-bg); border-radius: 15px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .q-text { font-size: 1.2rem; font-weight: 600; margin-bottom: 15px; }
-        .options { display: flex; flex-direction: column; gap: 10px; }
-        .opt-btn { text-align: left; padding: 12px 20px; border: 1px solid #e2e8f0; border-radius: 10px; background: white; cursor: pointer; transition: 0.2s; font-size: 1rem; }
-        .opt-btn:hover { border-color: var(--primary-color); background: #f0f7ff; }
-        .explanation { display: none; margin-top: 15px; padding: 15px; background: #e8f5e9; border-left: 4px solid var(--correct-color); border-radius: 4px; color: #1b5e20; }
-        .explanation.show { display: block; animation: fadeIn 0.4s; }
-        .flashcards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 40px; }
-        .flashcard { background: transparent; perspective: 1000px; height: 150px; cursor: pointer; }
-        .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
-        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
-        .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .flashcard-front { background: var(--primary-color); color: white; font-weight: 500; }
-        .flashcard-back { background: var(--correct-color); color: white; transform: rotateY(180deg); font-size: 0.95rem; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        :root { --primary: #2563eb; --primary-hover: #1d4ed8; --success: #16a34a; --danger: #dc2626; --background: #f8fafc; --surface: #ffffff; --text: #0f172a; --text-light: #64748b; }
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--background); color: var(--text); line-height: 1.5; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { max-width: 650px; width: 100%; background: var(--surface); padding: 28px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        h1, h2, h3 { text-align: center; margin-top: 0; } .hidden { display: none !important; }
+        #progress-bar { height: 8px; background: #e2e8f0; border-radius: 4px; margin-bottom: 16px; overflow: hidden; }
+        #progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s ease; }
+        .palette-container { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0; }
+        .palette-title { font-size: 0.85rem; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; text-align: center; }
+        .palette-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(36px, 1fr)); gap: 6px; }
+        .palette-btn { border: 1px solid #cbd5e1; background: #f8fafc; color: var(--text); padding: 6px 0; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.15s ease; }
+        .palette-btn:hover { background: #e2e8f0; } .palette-btn.active { border: 2px solid var(--primary); color: var(--primary); font-weight: 700; }
+        .palette-btn.answered { background-color: var(--primary); color: white; border-color: var(--primary); }
+        .palette-btn.active.answered { outline: 2px solid #0f172a; outline-offset: 1px; }
+        .question-header { font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; }
+        .options-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .option-label { display: flex; align-items: center; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .option-label:hover { background-color: #f1f5f9; } .option-label.correct-bg { background-color: #dcfce7; border-color: var(--success); } .option-label.incorrect-bg { background-color: #fee2e2; border-color: var(--danger); }
+        .option-label input { margin-right: 12px; transform: scale(1.2); }
+        .btn { background-color: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s; width: 100%; margin-bottom: 10px; }
+        .btn:hover { background-color: var(--primary-hover); } .btn-outline { background-color: transparent; color: var(--primary); border: 2px solid var(--primary); } .btn-outline:hover { background-color: #eff6ff; } .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+        .explanation { background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.95rem; border-left: 4px solid var(--primary); }
+        .nav-controls { display: flex; gap: 10px; margin-top: 15px; border-top: 1px solid #e2e8f0; padding-top: 15px; } .nav-controls .btn { margin-bottom: 0; flex: 1; }
+        .flashcard-container { perspective: 1000px; width: 100%; height: 300px; margin: 30px 0; cursor: pointer; }
+        .flashcard { width: 100%; height: 100%; position: relative; transition: transform 0.6s; transform-style: preserve-3d; border-radius: 12px; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); }
+        .flashcard.is-flipped { transform: rotateY(180deg); }
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; border-radius: 12px; font-size: 1.25rem; text-align: center; }
+        .card-front { background-color: var(--primary); color: white; } .card-back { background-color: var(--surface); color: var(--text); border: 2px solid var(--primary); transform: rotateY(180deg); }
+        .flashcard-controls { display: flex; justify-content: space-between; align-items: center; gap: 10px; } .flashcard-controls button { width: auto; flex: 1; }
+        .instruction { text-align: center; color: var(--text-light); font-size: 0.85rem; margin-bottom: 10px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <a href="index.html" class="btn-back">← Back to Portal</a>
-        <div class="header">
-            <h1>Test 3: General Knowledge</h1>
+<div class="container">
+    <div id="quiz-section">
+        <h2 id="round-title">Test 3</h2>
+        <div id="progress-bar"><div id="progress-fill"></div></div>
+        <div class="palette-container"><div class="palette-title">Question Navigator</div><div class="palette-grid" id="palette-grid"></div></div>
+        <div id="quiz-content">
+            <div class="question-header" id="question-text">Loading question...</div>
+            <div class="instruction" id="question-instruction"></div>
+            <div class="options-grid" id="options-container"></div>
+            <div id="explanation-box" class="explanation hidden"></div>
+            <button id="submit-btn" class="btn" onclick="submitAnswer()">Submit Answer</button>
+            <button id="show-answer-btn" class="btn btn-outline" onclick="showAnswer()">Show Answer & Explanation</button>
+            <div class="nav-controls">
+                <button id="prev-btn" class="btn btn-outline" onclick="prevQuestion()">← Previous</button>
+                <button id="finish-btn" class="btn btn-outline" style="background:#16a34a;color:white;border-color:#16a34a;" onclick="finishQuiz()">Finish Quiz</button>
+                <button id="next-btn" class="btn btn-outline" onclick="nextQuestion()">Next →</button>
+            </div>
         </div>
-        <div id="quiz-feed"></div>
-        <div class="header" style="margin-top: 50px;">
-            <h2>Quick-Revision Flashcards</h2>
+        <div id="quiz-results" class="hidden">
+            <h2>Quiz Complete!</h2>
+            <h1 id="final-score">0 / 20</h1>
+            <p style="text-align: center; margin-bottom: 25px;">Review finished! Proceed below to study the high-yield facts.</p>
+            <button class="btn" onclick="startFlashcards()">Proceed to Topic Facts Flashcards</button>
+            <button class="btn btn-outline" onclick="reviewQuestions()">Review Questions</button>
         </div>
-        <div class="flashcards-grid" id="fc-feed"></div>
     </div>
-    <script>
-        const data = [
-            {q: '1. Which agreement created the European Economic Community in 1957?', opts: ['A. Maastricht Treaty', 'B. Treaty of Rome', 'C. Treaty of Lisbon', 'D. Schengen Agreement'], ans: 1, exp: 'The Treaty of Rome established the European Economic Community in 1957.[span_51](start_span)[span_51](end_span)'},
-            {q: '2. Which Indian ruler built the Vijay Stambha at Chittorgarh?', opts: ['A. Rana Sanga', 'B. Rana Kumbha', 'C. Maharana Pratap', 'D. Bappa Rawal'], ans: 1, exp: 'Rana Kumbha built the Tower of Victory in the 15th century.[span_52](start_span)[span_52](end_span)'},
-            {q: '3. Which country contains the historical region of Transylvania?', opts: ['A. Hungary', 'B. Romania', 'C. Bulgaria', 'D. Serbia'], ans: 1, exp: 'Transylvania is a region in central Romania.[span_53](start_span)[span_53](end_span)'},
-            {q: '4. Which is the world\'s largest inland body of water by surface area?', opts: ['A. Lake Superior', 'B. Caspian Sea', 'C. Lake Baikal', 'D. Lake Victoria'], ans: 1, exp: 'The Caspian Sea is the largest inland body of water.[span_54](start_span)[span_54](end_span)'},
-            {q: '5. Lake Victoria is a major source region for which river system?', opts: ['A. Congo', 'B. White Nile', 'C. Niger', 'D. Zambezi'], ans: 1, exp: 'The White Nile\'s source region includes Lake Victoria.[span_55](start_span)[span_55](end_span)'},
-            {q: '6. Who was the first woman to fly solo across the Atlantic Ocean?', opts: ['A. Bessie Coleman', 'B. Amelia Earhart', 'C. Valentina Tereshkova', 'D. Jacqueline Cochran'], ans: 1, exp: 'Amelia Earhart made the solo transatlantic flight in 1932.[span_56](start_span)[span_56](end_span)'},
-            {q: '7. Which Indian state is associated with the Hornbill Festival?', opts: ['A. Manipur', 'B. Nagaland', 'C. Mizoram', 'D. Arunachal Pradesh'], ans: 1, exp: 'Nagaland hosts the Hornbill Festival each December.[span_57](start_span)[span_57](end_span)'},
-            {q: '8. Which South American country has French Guiana as a neighbouring territory across its land border?', opts: ['A. Chile', 'B. Brazil', 'C. Peru', 'D. Ecuador'], ans: 1, exp: 'Brazil shares a land border with French Guiana, an overseas department of France.[span_58](start_span)[span_58](end_span)'},
-            {q: '9. Which ancient civilisation developed cuneiform writing?', opts: ['A. Maya', 'B. Sumerian', 'C. Inca', 'D. Phoenician only'], ans: 1, exp: 'Cuneiform developed in ancient Mesopotamia, especially among the Sumerians.[span_59](start_span)[span_59](end_span)'},
-            {q: '10. Which Indian state has the largest forest cover by area, according to commonly cited Forest Survey of India reports?', opts: ['A. Kerala', 'B. Madhya Pradesh', 'C. Punjab', 'D. Haryana'], ans: 1, exp: 'Madh Pradesh has generally ranked first by forest cover area.[span_60](start_span)[span_60](end_span)'},
-            {q: '11. Who wrote The Discovery of India?', opts: ['A. Sardar Patel', 'B. Jawaharlal Nehru', 'C. B. R. Ambedkar', 'D. Subhas Chandra Bose'], ans: 1, exp: 'Nehru wrote the book while imprisoned during the 1940s.[span_61](start_span)[span_61](end_span)'},
-            {q: '12. Which country\'s parliament is known as the Knesset?', opts: ['A. Greece', 'B. Israel', 'C. Turkey', 'D. Lebanon'], ans: 1, exp: 'The Knesset is Israel\'s unicameral parliament.[span_62](start_span)[span_62](end_span)'},
-            {q: '13. What is the SI-derived unit of catalytic activity?', opts: ['A. Tesla', 'B. Katal', 'C. Weber', 'D. Becquerel'], ans: 1, exp: 'The katal measures catalytic activity.[span_63](start_span)[span_63](end_span)'},
-            {q: '14. Which body of water connects the Red Sea to the Gulf of Aden?', opts: ['A. Strait of Hormuz', 'B. Bab-el-Mandeb Strait', 'C. Strait of Malacca', 'D. Dardanelles'], ans: 1, exp: 'Bab-el-Mandeb lies between Yemen and the Horn of Africa.[span_64](start_span)[span_64](end_span)'},
-            {q: '15. Which Indian classical musician was awarded the Bharat Ratna in 1998?', opts: ['A. Ravi Shankar', 'B. M. S. Subbulakshmi', 'C. Bismillah Khan', 'D. Bhimsen Joshi'], ans: 1, exp: 'Carnatic vocalist M. S. Subbulakshmi received the Bharat Ratna in 1998.[span_65](start_span)[span_65](end_span)'},
-            {q: '16. Which country is home to the ancient city of Timbuktu?', opts: ['A. Niger', 'B. Mali', 'C. Chad', 'D. Senegal'], ans: 1, exp: 'Timbuktu is a historic city in Mali.[span_66](start_span)[span_66](end_span)'},
-            {q: '17. Which branch of the United Nations system publishes the World Economic Situation and Prospects report with UN DESA?', opts: ['A. UNDP alone', 'B. UN DESA with UNCTAD and other partners', 'C. UNICEF', 'D. WHO'], ans: 1, exp: 'The report is prepared by UN DESA with partner organisations including UNCTAD.[span_67](start_span)[span_67](end_span)'},
-            {q: '18. Which Indian state is famous for the Sun Temple at Konark?', opts: ['A. Odisha', 'B. Bihar', 'C. Gujarat', 'D. Maharashtra'], ans: 0, exp: 'The Konark Sun Temple is in Odisha.[span_68](start_span)[span_68](end_span)'},
-            {q: '19. Which country has the world\'s longest international land border with the United States?', opts: ['A. Mexico', 'B. Canada', 'C. Russia', 'D. Cuba'], ans: 1, exp: 'The Canada-United States border is the world\'s longest international land border.[span_69](start_span)[span_69](end_span)'},
-            {q: '20. What is the capital of Kazakhstan?', opts: ['A. Almaty', 'B. Astana', 'C. Tashkent', 'D. Bishkek'], ans: 1, exp: 'Kazakhstan\'s capital is Astana.[span_70](start_span)[span_70](end_span)'}
-        ];
-        const flashcards = [
-            {q: 'What is the capital of Laos?', a: 'Vientiane.[span_71](start_span)[span_71](end_span)'},
-            {q: 'Which civilisation built Machu Picchu?', a: 'The Inca civilisation.[span_72](start_span)[span_72](end_span)'},
-            {q: 'What does UNESCO stand for?', a: 'United Nations Educational, Scientific and Cultural Organization.[span_73](start_span)[span_73](end_span)'},
-            {q: 'Which is the largest island in the world, excluding continents?', a: 'Greenland.[span_74](start_span)[span_74](end_span)'},
-            {q: 'What is the currency of Switzerland?', a: 'The Swiss franc.[span_75](start_span)[span_75](end_span)'}
-        ];
+    <div id="flashcard-section" class="hidden">
+        <h2>Topic Facts Flashcards</h2>
+        <p class="instruction">Click or tap the card to flip between the Topic and the Fact.</p>
+        <div class="flashcard-container" onclick="flipCard()"><div class="flashcard" id="flashcard"><div class="card-face card-front" id="card-front">Topic</div><div class="card-face card-back" id="card-back">Fact</div></div></div>
+        <p style="text-align: center; font-weight: bold;" id="card-counter">1 / 5</p>
+        <div class="flashcard-controls">
+            <button class="btn btn-outline" onclick="prevCard()">Previous</button>
+            <button class="btn btn-outline" onclick="nextCard()">Next</button>
+        </div>
+        <a href="index.html" style="text-decoration:none;"><button class="btn" style="margin-top: 20px;">Back to Main Menu</button></a>
+    </div>
+</div>
+<script>
+    const quizData = [
+        { round: "Test 3", text: "Which agreement created the European Economic Community in 1957?", type: "single", options: ["Maastricht Treaty", "Treaty of Rome", "Treaty of Lisbon", "Schengen Agreement"], correct: [1], exp: "The Treaty of Rome established the European Economic Community in 1957." },
+        { round: "Test 3", text: "Which Indian ruler built the Vijay Stambha at Chittorgarh?", type: "single", options: ["Rana Sanga", "Rana Kumbha", "Maharana Pratap", "Bappa Rawal"], correct: [1], exp: "Rana Kumbha built the Tower of Victory in the 15th century." },
+        { round: "Test 3", text: "Which country contains the historical region of Transylvania?", type: "single", options: ["Hungary", "Romania", "Bulgaria", "Serbia"], correct: [1], exp: "Transylvania is a region in central Romania." },
+        { round: "Test 3", text: "Which is the world's largest inland body of water by surface area?", type: "single", options: ["Lake Superior", "Caspian Sea", "Lake Baikal", "Lake Victoria"], correct: [1], exp: "The Caspian Sea is the largest inland body of water." },
+        { round: "Test 3", text: "Lake Victoria is a major source region for which river system?", type: "single", options: ["Congo", "White Nile", "Niger", "Zambezi"], correct: [1], exp: "The White Nile's source region includes Lake Victoria." },
+        { round: "Test 3", text: "Who was the first woman to fly solo across the Atlantic Ocean?", type: "single", options: ["Bessie Coleman", "Amelia Earhart", "Valentina Tereshkova", "Jacqueline Cochran"], correct: [1], exp: "Amelia Earhart made the solo transatlantic flight in 1932." },
+        { round: "Test 3", text: "Which Indian state is associated with the Hornbill Festival?", type: "single", options: ["Manipur", "Nagaland", "Mizoram", "Arunachal Pradesh"], correct: [1], exp: "Nagaland hosts the Hornbill Festival each December." },
+        { round: "Test 3", text: "Which South American country has French Guiana as a neighbouring territory across its land border?", type: "single", options: ["Chile", "Brazil", "Peru", "Ecuador"], correct: [1], exp: "Brazil shares a land border with French Guiana, an overseas department of France." },
+        { round: "Test 3", text: "Which ancient civilisation developed cuneiform writing?", type: "single", options: ["Maya", "Sumerian", "Inca", "Phoenician only"], correct: [1], exp: "Cuneiform developed in ancient Mesopotamia, especially among the Sumerians." },
+        { round: "Test 3", text: "Which Indian state has the largest forest cover by area, according to commonly cited Forest Survey of India reports?", type: "single", options: ["Kerala", "Madhya Pradesh", "Punjab", "Haryana"], correct: [1], exp: "Madhya Pradesh has generally ranked first by forest cover area." },
+        { round: "Test 3", text: "Who wrote 'The Discovery of India'?", type: "single", options: ["Sardar Patel", "Jawaharlal Nehru", "B. R. Ambedkar", "Subhas Chandra Bose"], correct: [1], exp: "Nehru wrote the book while imprisoned during the 1940s." },
+        { round: "Test 3", text: "Which country's parliament is known as the Knesset?", type: "single", options: ["Greece", "Israel", "Turkey", "Lebanon"], correct: [1], exp: "The Knesset is Israel's unicameral parliament." },
+        { round: "Test 3", text: "What is the SI-derived unit of catalytic activity?", type: "single", options: ["Tesla", "Katal", "Weber", "Becquerel"], correct: [1], exp: "The katal measures catalytic activity." },
+        { round: "Test 3", text: "Which body of water connects the Red Sea to the Gulf of Aden?", type: "single", options: ["Strait of Hormuz", "Bab-el-Mandeb Strait", "Strait of Malacca", "Dardanelles"], correct: [1], exp: "Bab-el-Mandeb lies between Yemen and the Horn of Africa." },
+        { round: "Test 3", text: "Which Indian classical musician was awarded the Bharat Ratna in 1998?", type: "single", options: ["Ravi Shankar", "M. S. Subbulakshmi", "Bismillah Khan", "Bhimsen Joshi"], correct: [1], exp: "Carnatic vocalist M. S. Subbulakshmi received the Bharat Ratna in 1998." },
+        { round: "Test 3", text: "Which country is home to the ancient city of Timbuktu?", type: "single", options: ["Niger", "Mali", "Chad", "Senegal"], correct: [1], exp: "Timbuktu is a historic city in Mali." },
+        { round: "Test 3", text: "Which branch of the United Nations system publishes the World Economic Situation and Prospects report with UN DESA?", type: "single", options: ["UNDP alone", "UN DESA with UNCTAD and other partners", "UNICEF", "WHO"], correct: [1], exp: "The report is prepared by UN DESA with partner organisations including UNCTAD." },
+        { round: "Test 3", text: "Which Indian state is famous for the Sun Temple at Konark?", type: "single", options: ["Odisha", "Bihar", "Gujarat", "Maharashtra"], correct: [0], exp: "The Konark Sun Temple is in Odisha." },
+        { round: "Test 3", text: "Which country has the world's longest international land border with the United States?", type: "single", options: ["Mexico", "Canada", "Russia", "Cuba"], correct: [1], exp: "The Canada-United States border is the world's longest international land border." },
+        { round: "Test 3", text: "What is the capital of Kazakhstan?", type: "single", options: ["Almaty", "Astana", "Tashkent", "Bishkek"], correct: [1], exp: "Kazakhstan's capital is Astana." }
+    ];
 
-        const feed = document.getElementById('quiz-feed');
-        data.forEach((item, index) => {
-            const card = document.createElement('div');
-            card.className = 'q-card';
-            let optsHtml = item.opts.map((opt) => `<button class="opt-btn" onclick="reveal(${index})">${opt}</button>`).join('');
-            card.innerHTML = `<div class="q-text">${item.q}</div><div class="options">${optsHtml}</div><div class="explanation" id="exp-${index}"><strong>Correct Answer: ${item.opts[item.ans]}</strong><br><br>${item.exp}</div>`;
-            feed.appendChild(card);
-        });
+    const flashcardsData = [
+        { topic: "Capital of Laos", fact: "Vientiane" },
+        { topic: "Civilisation that built Machu Picchu", fact: "The Inca civilisation" },
+        { topic: "UNESCO Full Form", fact: "United Nations Educational, Scientific and Cultural Organization" },
+        { topic: "World's largest island (excluding continents)", fact: "Greenland" },
+        { topic: "Currency of Switzerland", fact: "The Swiss franc" }
+    ];
 
-        const fcFeed = document.getElementById('fc-feed');
-        flashcards.forEach((fc) => {
-            fcFeed.innerHTML += `<div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner"><div class="flashcard-front">${fc.q}</div><div class="flashcard-back">${fc.a}</div></div></div>`;
-        });
-        function reveal(id) { document.getElementById(`exp-${id}`).classList.add('show'); }
-    </script>
+    const userAnswers = Array(quizData.length).fill(null).map(() => ({ selected: [], submitted: false, revealed: false, isCorrect: false }));
+    let currentQ = 0; let currentFact = 0;
+    const qTitle = document.getElementById("round-title"), qText = document.getElementById("question-text"), qInst = document.getElementById("question-instruction"), optionsContainer = document.getElementById("options-container"), expBox = document.getElementById("explanation-box"), submitBtn = document.getElementById("submit-btn"), showAnsBtn = document.getElementById("show-answer-btn"), prevBtn = document.getElementById("prev-btn"), nextBtn = document.getElementById("next-btn"), progressFill = document.getElementById("progress-fill"), paletteGrid = document.getElementById("palette-grid");
+
+    function initPalette() { paletteGrid.innerHTML = ""; quizData.forEach((_, idx) => { const btn = document.createElement("button"); btn.className = "palette-btn"; btn.id = `palette-btn-${idx}`; btn.innerText = idx + 1; btn.onclick = () => jumpToQuestion(idx); paletteGrid.appendChild(btn); }); }
+    function updatePalette() { quizData.forEach((_, idx) => { const btn = document.getElementById(`palette-btn-${idx}`); btn.classList.toggle("active", idx === currentQ); btn.classList.toggle("answered", userAnswers[idx].submitted || userAnswers[idx].revealed); }); }
+    function loadQuestion() { const q = quizData[currentQ]; const state = userAnswers[currentQ]; qTitle.innerText = `${q.round} (Question ${currentQ + 1} of ${quizData.length})`; qText.innerText = q.text; qInst.innerText = q.type === "multi" ? "Select multiple answers:" : "Select one answer:"; progressFill.style.width = `${(userAnswers.filter(a => a.submitted || a.revealed).length / quizData.length) * 100}%`; optionsContainer.innerHTML = ""; expBox.innerHTML = `<strong>Explanation:</strong> ${q.exp}`; prevBtn.disabled = (currentQ === 0); nextBtn.disabled = (currentQ === quizData.length - 1); q.options.forEach((opt, index) => { const label = document.createElement("label"); label.className = "option-label"; label.id = `label-${index}`; const input = document.createElement("input"); input.type = q.type === "multi" ? "checkbox" : "radio"; input.name = "quiz-option"; input.value = index; input.checked = state.selected.includes(index); input.disabled = (state.submitted || state.revealed); input.onchange = () => { state.selected = getSelectedInputs(); }; label.appendChild(input); label.appendChild(document.createTextNode(opt)); optionsContainer.appendChild(label); }); if (state.submitted || state.revealed) { highlightAnswers(); expBox.classList.remove("hidden"); submitBtn.classList.add("hidden"); showAnsBtn.classList.add("hidden"); } else { expBox.classList.add("hidden"); submitBtn.classList.remove("hidden"); showAnsBtn.classList.remove("hidden"); } updatePalette(); }
+    function getSelectedInputs() { return Array.from(document.querySelectorAll('input[name="quiz-option"]:checked')).map(i => parseInt(i.value)); }
+    function highlightAnswers() { const q = quizData[currentQ]; const state = userAnswers[currentQ]; q.options.forEach((_, i) => { const lbl = document.getElementById(`label-${i}`); if (q.correct.includes(i)) { lbl.classList.add("correct-bg"); } else if (state.selected.includes(i)) { lbl.classList.add("incorrect-bg"); } }); }
+    function lockQuestion(revealedOnly = false) { const q = quizData[currentQ]; const state = userAnswers[currentQ]; state.selected = getSelectedInputs(); if (revealedOnly) { state.revealed = true; state.isCorrect = false; } else { state.submitted = true; state.isCorrect = ([...q.correct].sort().join(",") === [...state.selected].sort().join(",")); } document.querySelectorAll('input[name="quiz-option"]').forEach(i => i.disabled = true); highlightAnswers(); expBox.classList.remove("hidden"); submitBtn.classList.add("hidden"); showAnsBtn.classList.add("hidden"); updatePalette(); progressFill.style.width = `${(userAnswers.filter(a => a.submitted || a.revealed).length / quizData.length) * 100}%`; }
+    function submitAnswer() { if (getSelectedInputs().length === 0) { alert("Please select an answer first."); return; } lockQuestion(false); }
+    function showAnswer() { lockQuestion(true); }
+    function jumpToQuestion(idx) { currentQ = idx; loadQuestion(); }
+    function nextQuestion() { if (currentQ < quizData.length - 1) { currentQ++; loadQuestion(); } }
+    function prevQuestion() { if (currentQ > 0) { currentQ--; loadQuestion(); } }
+    function finishQuiz() { document.getElementById("quiz-content").classList.add("hidden"); document.getElementById("progress-bar").classList.add("hidden"); document.getElementById("round-title").classList.add("hidden"); document.querySelector(".palette-container").classList.add("hidden"); document.getElementById("quiz-results").classList.remove("hidden"); document.getElementById("final-score").innerText = `${userAnswers.filter(a => a.isCorrect).length} / ${quizData.length}`; }
+    function reviewQuestions() { document.getElementById("quiz-results").classList.add("hidden"); document.getElementById("quiz-content").classList.remove("hidden"); document.getElementById("progress-bar").classList.remove("hidden"); document.getElementById("round-title").classList.remove("hidden"); document.querySelector(".palette-container").classList.remove("hidden"); currentQ = 0; loadQuestion(); }
+    function startFlashcards() { document.getElementById("quiz-section").classList.add("hidden"); document.getElementById("flashcard-section").classList.remove("hidden"); loadFact(); }
+    function loadFact() { const f = flashcardsData[currentFact]; document.getElementById("card-front").innerText = f.topic; document.getElementById("card-back").innerText = f.fact; document.getElementById("card-counter").innerText = `${currentFact + 1} / ${flashcardsData.length}`; document.getElementById("flashcard").classList.remove("is-flipped"); }
+    function flipCard() { document.getElementById("flashcard").classList.toggle("is-flipped"); }
+    function nextCard() { currentFact = (currentFact + 1) % flashcardsData.length; loadFact(); }
+    function prevCard() { currentFact = (currentFact - 1 + flashcardsData.length) % flashcardsData.length; loadFact(); }
+    initPalette(); loadQuestion();
+</script>
 </body>
 </html>
