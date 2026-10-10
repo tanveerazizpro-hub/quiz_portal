@@ -3,20 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inter-School Quiz</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>InterSchool Quiz Competition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --secondary: #ec4899;
-            --bg-gradient: linear-gradient(135deg, #f3e8ff 0%, #e0e7ff 100%);
-            --card-bg: rgba(255, 255, 255, 0.85);
-            --text-main: #1e1b4b;
-            --text-light: #4f46e5;
-            --success: #10b981;
-            --error: #ef4444;
-            --shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+            --primary-color: #4a90e2;
+            --primary-hover: #357abd;
+            --bg-gradient-start: #f5f7fa;
+            --bg-gradient-end: #c3cfe2;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --card-bg: rgba(255, 255, 255, 0.9);
         }
 
         * {
@@ -27,746 +24,205 @@
         }
 
         body {
-            background: var(--bg-gradient);
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
             min-height: 100vh;
-            color: var(--text-main);
-            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-dark);
         }
 
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+            min-height: 500px;
+        }
+
+        /* Screen transitions */
         .screen {
             display: none;
-            min-height: 100vh;
-            padding: 2rem;
-            animation: fadeIn 0.4s ease-out forwards;
+            animation: fadeIn 0.5s ease-in-out forwards;
         }
-
         .screen.active {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            display: block;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* UI Components */
-        .glass-panel {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: var(--shadow);
-            padding: 3rem;
-            width: 100%;
-            max-width: 900px;
-        }
-
+        /* Typography */
         h1 {
-            font-size: 3rem;
+            font-size: 2.5rem;
+            color: var(--text-dark);
+            margin-bottom: 10px;
             font-weight: 700;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 1rem;
-            text-align: center;
         }
-
-        h2 {
-            font-size: 2rem;
-            color: var(--text-main);
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-
-        .btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 12px;
+        p.subtitle {
+            color: var(--text-light);
             font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+            margin-bottom: 40px;
         }
 
-        .btn:hover {
-            background: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-            box-shadow: none;
-        }
-        
-        .btn-outline:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        /* Home & Menu Grids */
+        /* Button Grid Layout */
         .grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            width: 100%;
-            margin-top: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
         }
 
-        .category-card {
+        /* Styling the Cards/Buttons */
+        .btn-card {
             background: white;
-            border-radius: 16px;
-            padding: 2rem;
-            text-align: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            cursor: pointer;
             border: 2px solid transparent;
-        }
-
-        .category-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary);
-            box-shadow: var(--shadow);
-        }
-
-        .category-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        /* Quiz UI */
-        .quiz-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid rgba(79, 70, 229, 0.1);
-        }
-
-        .question-text {
-            font-size: 1.4rem;
+            border-radius: 15px;
+            padding: 30px 20px;
+            font-size: 1.2rem;
             font-weight: 600;
-            margin-bottom: 2rem;
-            line-height: 1.5;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
-        .options-grid {
-            display: grid;
-            gap: 1rem;
-            margin-bottom: 2rem;
+        .btn-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 12px 20px rgba(74, 144, 226, 0.2);
+            background: var(--primary-color);
+            color: white;
         }
 
-        .option-btn {
+        /* Secondary Buttons (For Tests) */
+        .test-btn {
             background: white;
-            border: 2px solid #e5e7eb;
-            padding: 1rem 1.5rem;
+            border: 1px solid #e1e8ed;
+            padding: 20px;
             border-radius: 12px;
             font-size: 1.1rem;
-            text-align: left;
+            color: var(--text-dark);
             cursor: pointer;
-            transition: all 0.2s;
-            color: var(--text-main);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
         }
 
-        .option-btn:hover {
-            border-color: var(--primary);
-            background: #f8fafc;
-        }
-
-        .option-btn.selected {
-            border-color: var(--primary);
-            background: #eff6ff;
-            font-weight: 600;
-        }
-
-        .action-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 2rem;
-        }
-
-        .nav-arrows {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .arrow-btn {
-            background: white;
-            border: 2px solid #e5e7eb;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: var(--text-main);
-        }
-
-        .arrow-btn:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .arrow-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            border-color: #e5e7eb;
-            color: #9ca3af;
-        }
-
-        /* Explanation Box */
-        .explanation-box {
-            display: none;
-            background: #ecfdf5;
-            border-left: 4px solid var(--success);
-            padding: 1.5rem;
-            border-radius: 0 12px 12px 0;
-            margin-top: 2rem;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .explanation-box.visible {
-            display: block;
-        }
-
-        .correct-answer-text {
-            font-weight: 700;
-            color: var(--success);
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-
-        /* Navigator Grid */
-        .nav-grid {
-            display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            gap: 0.5rem;
-            margin-top: 3rem;
-            padding-top: 2rem;
-            border-top: 2px solid rgba(79, 70, 229, 0.1);
-        }
-
-        .nav-box {
-            aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            background: white;
-            border: 2px solid #e5e7eb;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-        }
-
-        .nav-box:hover {
-            border-color: var(--primary);
-        }
-
-        .nav-box.active {
-            border-color: var(--primary);
-            background: var(--primary);
+        .test-btn:hover {
+            background: var(--primary-color);
             color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(74, 144, 226, 0.2);
         }
 
-        .nav-box.answered {
-            background: #e0e7ff;
-            border-color: #c7d2fe;
-            color: var(--primary);
-        }
-
-        .nav-box.answered.active {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-        }
-
-        /* Flashcards */
-        .flashcards-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 2rem;
-            justify-content: center;
-            margin-top: 2rem;
-        }
-
-        .flashcard {
-            width: 300px;
-            height: 200px;
-            perspective: 1000px;
+        /* Back Button */
+        .btn-back {
+            margin-top: 40px;
+            padding: 10px 25px;
+            background: transparent;
+            border: 2px solid var(--text-light);
+            color: var(--text-light);
+            border-radius: 25px;
+            font-size: 1rem;
             cursor: pointer;
-        }
-
-        .flashcard-inner {
-            width: 100%;
-            height: 100%;
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            transform-style: preserve-3d;
-            position: relative;
-        }
-
-        .flashcard:hover .flashcard-inner {
-            transform: rotateY(180deg);
-        }
-
-        .flashcard-front, .flashcard-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            border-radius: 16px;
-            padding: 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
-
-        .flashcard-front {
-            background: white;
-            border: 2px solid var(--primary);
-        }
-
-        .flashcard-back {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            transform: rotateY(180deg);
-        }
-
-        .flashcard-title {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            position: absolute;
-            top: 1rem;
-            opacity: 0.7;
-        }
-
-        /* Citations */
-        .citation {
-            font-size: 0.75rem;
-            color: #6b7280;
-            background: #f3f4f6;
-            padding: 0.1rem 0.4rem;
-            border-radius: 4px;
-            margin-left: 4px;
-            vertical-align: middle;
+            transition: all 0.3s ease;
             font-weight: 500;
         }
 
-        .flashcard-back .citation {
-            color: rgba(255,255,255,0.8);
-            background: rgba(0,0,0,0.2);
+        .btn-back:hover {
+            background: var(--text-light);
+            color: white;
+        }
+
+        /* Subject Header on Test Screen */
+        #dynamic-subject-title {
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            font-size: 2rem;
         }
     </style>
 </head>
 <body>
 
-    <!-- SCREEN 1: Home -->
-    <div id="screen-home" class="screen active">
-        <div class="glass-panel" style="text-align: center;">
-            <h1>Inter-School Quiz</h1>
-            <p style="font-size: 1.2rem; margin-bottom: 2rem; color: #4b5563;">Test your knowledge, compete with the best, and expand your mind.</p>
+    <div class="container">
+        
+        <!-- ================= HOME SCREEN ================= -->
+        <div id="home-screen" class="screen active">
+            <h1>InterSchool Quiz Competition</h1>
+            <p class="subtitle">Select your discipline to begin your journey</p>
             
-            <button class="btn" onclick="document.getElementById('subjects').scrollIntoView({behavior: 'smooth'})">Start Practicing</button>
-            
-            <div id="subjects" class="grid-container" style="margin-top: 4rem;">
-                <div class="category-card" onclick="alert('Mathematics module coming soon!')">
-                    <div class="category-icon">📐</div>
-                    <h3>Mathematics</h3>
-                    <p style="margin: 1rem 0; color: #6b7280;">Algebra, Geometry & Logic</p>
-                    <button class="btn btn-outline" style="width: 100%;">Start Practicing</button>
-                </div>
-                <div class="category-card" onclick="alert('Science module coming soon!')">
-                    <div class="category-icon">🔬</div>
-                    <h3>Science</h3>
-                    <p style="margin: 1rem 0; color: #6b7280;">Physics, Chemistry & Biology</p>
-                    <button class="btn btn-outline" style="width: 100%;">Start Practicing</button>
-                </div>
-                <div class="category-card" onclick="switchScreen('screen-gk-menu')">
-                    <div class="category-icon">🌍</div>
-                    <h3>General Knowledge</h3>
-                    <p style="margin: 1rem 0; color: #6b7280;">History, Geography & World Facts</p>
-                    <button class="btn btn-outline" style="width: 100%;">Start Practicing</button>
-                </div>
+            <div class="grid-container">
+                <button class="btn-card" onclick="openSubject('Mathematics')">
+                    Mathematics
+                </button>
+                <button class="btn-card" onclick="openSubject('Science')">
+                    Science
+                </button>
+                <button class="btn-card" onclick="openSubject('General Knowledge')">
+                    General Knowledge
+                </button>
             </div>
         </div>
-    </div>
 
-    <!-- SCREEN 2: GK Menu -->
-    <div id="screen-gk-menu" class="screen">
-        <div class="glass-panel">
-            <button class="btn btn-outline" style="margin-bottom: 2rem; padding: 0.5rem 1rem;" onclick="switchScreen('screen-home')">← Back to Home</button>
-            <h2>General Knowledge Arena</h2>
-            <p style="text-align: center; margin-bottom: 3rem; color: #4b5563;">Select a test to begin. Each test contains 20 questions followed by 5 quick-revision flashcards.</p>
+        <!-- ================= TESTS SCREEN ================= -->
+        <div id="tests-screen" class="screen">
+            <h2 id="dynamic-subject-title">Subject Name</h2>
+            <p class="subtitle">Select a test module to start</p>
             
-            <div class="grid-container" style="grid-template-columns: repeat(2, 1fr);">
-                <div class="category-card" onclick="startTest(1)">
-                    <h3 style="font-size: 1.5rem; margin-bottom: 1rem; color: var(--primary);">Test 1</h3>
-                    <p style="margin-bottom: 1.5rem;">20 Questions + 5 Flashcards</p>
-                    <button class="btn" style="width: 100%;">Begin Test</button>
-                </div>
-                <div class="category-card" onclick="startTest(2)">
-                    <h3 style="font-size: 1.5rem; margin-bottom: 1rem; color: var(--primary);">Test 2</h3>
-                    <p style="margin-bottom: 1.5rem;">20 Questions + 5 Flashcards</p>
-                    <button class="btn" style="width: 100%;">Begin Test</button>
-                </div>
-                <div class="category-card" onclick="startTest(3)">
-                    <h3 style="font-size: 1.5rem; margin-bottom: 1rem; color: var(--primary);">Test 3</h3>
-                    <p style="margin-bottom: 1.5rem;">20 Questions + 5 Flashcards</p>
-                    <button class="btn" style="width: 100%;">Begin Test</button>
-                </div>
-                <div class="category-card" onclick="startTest(4)">
-                    <h3 style="font-size: 1.5rem; margin-bottom: 1rem; color: var(--primary);">Test 4</h3>
-                    <p style="margin-bottom: 1.5rem;">20 Questions + 5 Flashcards</p>
-                    <button class="btn" style="width: 100%;">Begin Test</button>
-                </div>
+            <div class="grid-container">
+                <button class="test-btn">Test 1</button>
+                <button class="test-btn">Test 2</button>
+                <button class="test-btn">Test 3</button>
+                <button class="test-btn">Test 4</button>
             </div>
+
+            <button class="btn-back" onclick="goBack()">← Back to Subjects</button>
         </div>
-    </div>
 
-    <!-- SCREEN 3: Quiz Interface -->
-    <div id="screen-quiz" class="screen">
-        <div class="glass-panel">
-            <div class="quiz-header">
-                <div>
-                    <span id="quiz-title" style="font-weight: 700; color: var(--primary); margin-right: 1rem;">Test 1</span>
-                    <span style="color: #6b7280;">Question <span id="current-q-num">1</span> of 20</span>
-                </div>
-                <button class="btn btn-outline" style="padding: 0.5rem 1rem;" onclick="switchScreen('screen-gk-menu')">Exit Test</button>
-            </div>
-
-            <div id="question-container">
-                <div class="question-text" id="q-text">Loading question...</div>
-                <div class="options-grid" id="options-container">
-                    <!-- Options injected via JS -->
-                </div>
-                
-                <div class="action-row">
-                    <button class="btn btn-outline" id="btn-show-ans" onclick="showAnswer()">👁 Show Answer</button>
-                    <button class="btn" id="btn-submit" style="display: none; background: var(--success);" onclick="submitTest()">Submit Test</button>
-                </div>
-
-                <div class="explanation-box" id="explanation-container">
-                    <span class="correct-answer-text">Correct Answer: <span id="correct-ans-text"></span></span>
-                    <p id="exp-text">Explanation here.</p>
-                </div>
-            </div>
-
-            <div class="action-row" style="border-top: 2px solid rgba(79,70,229,0.1); padding-top: 2rem; margin-top: 2rem;">
-                <div class="nav-arrows">
-                    <button class="arrow-btn" id="btn-prev" onclick="prevQuestion()">←</button>
-                    <button class="arrow-btn" id="btn-next" onclick="nextQuestion()">→</button>
-                </div>
-            </div>
-
-            <div class="nav-grid" id="nav-grid">
-                <!-- 20 Nav boxes injected via JS -->
-            </div>
-        </div>
-    </div>
-
-    <!-- SCREEN 4: Flashcards -->
-    <div id="screen-flashcards" class="screen">
-        <div class="glass-panel" style="max-width: 1100px;">
-            <h2>Excellent Work! 🎉</h2>
-            <p style="text-align: center; color: #4b5563; margin-bottom: 2rem;">Review these 5 quick facts from the test to solidify your knowledge.</p>
-            
-            <div class="flashcards-container" id="flashcards-container">
-                <!-- Flashcards injected via JS -->
-            </div>
-
-            <div style="text-align: center; margin-top: 4rem;">
-                <button class="btn" onclick="switchScreen('screen-gk-menu')">Return to Menu</button>
-            </div>
-        </div>
     </div>
 
     <script>
-        // Data Parser Helper: Formats citations nicely (FIXED SYNTAX ERROR)
-        function formatCitations(text) {
-            return text.replace(/\[cite:\s*([^\]]+)\]/g, '<span class="citation">Source $1</span>');
-        }
+        // DOM Elements
+        const homeScreen = document.getElementById('home-screen');
+        const testsScreen = document.getElementById('tests-screen');
+        const subjectTitle = document.getElementById('dynamic-subject-title');
 
-        // Quiz Database mapped exactly to provided documents
-        const gkData = {
-            1: {
-                questions: [
-                    { q: "Which ancient Indian text is traditionally associated with the phrase 'Satyameva Jayate'?[span_0](start_span)[span_0](end_span)", opts: ["Rigveda[span_1](start_span)[span_1](end_span)", "Mundaka Upanishad[span_2](start_span)[span_2](end_span)", "Arthashastra[span_3](start_span)[span_3](end_span)", "Bhagavad Gita[span_4](start_span)[span_4](end_span)"], ans: 1, exp: "The phrase means 'Truth alone triumphs' and comes from the Mundaka Upanishad.[span_5](start_span)[span_5](end_span)" },
-                    { q: "Who was the first woman to become the President of the Indian National Congress?[span_6](start_span)[span_6](end_span)", opts: ["Sarojini Naidu[span_7](start_span)[span_7](end_span)", "Annie Besant[span_8](start_span)[span_8](end_span)", "Vijaya Lakshmi Pandit[span_9](start_span)[span_9](end_span)", "Sucheta Kripalani[span_10](start_span)[span_10](end_span)"], ans: 1, exp: "Annie Besant became Congress president in 1917.[span_11](start_span)[span_11](end_span)" },
-                    { q: "Which Indian state was the first to be formed on a linguistic basis after independence?[span_12](start_span)[span_12](end_span)", opts: ["Gujarat[span_13](start_span)[span_13](end_span)", "Kerala[span_14](start_span)[span_14](end_span)", "Andhra State[span_15](start_span)[span_15](end_span)", "Karnataka[span_16](start_span)[span_16](end_span)"], ans: 2, exp: "Andhra State was created in 1953, largely for Telugu-speaking people.[span_17](start_span)[span_17](end_span)" },
-                    { q: "The ancient city of Petra is located in which present-day country?[span_18](start_span)[span_18](end_span)", opts: ["Egypt[span_19](start_span)[span_19](end_span)", "Jordan[span_20](start_span)[span_20](end_span)", "Lebanon[span_21](start_span)[span_21](end_span)", "Iraq[span_22](start_span)[span_22](end_span)"], ans: 1, exp: "Petra, famous for its rock-cut architecture, is in Jordan.[span_23](start_span)[span_23](end_span)" },
-                    { q: "Which of these was an ancient centre of learning in present-day Bihar?[span_24](start_span)[span_24](end_span)", opts: ["Taxila[span_25](start_span)[span_25](end_span)", "Nalanda[span_26](start_span)[span_26](end_span)", "Hampi[span_27](start_span)[span_27](end_span)", "Madurai[span_28](start_span)[span_28](end_span)"], ans: 1, exp: "Nalanda was a major ancient Buddhist learning centre in Bihar.[span_29](start_span)[span_29](end_span)" },
-                    { q: "Who was the first person to reach the South Pole?[span_30](start_span)[span_30](end_span)", opts: ["Robert Falcon Scott[span_31](start_span)[span_31](end_span)", "Ernest Shackleton[span_32](start_span)[span_32](end_span)", "Roald Amundsen[span_33](start_span)[span_33](end_span)", "Edmund Hillary[span_34](start_span)[span_34](end_span)"], ans: 2, exp: "Roald Amundsen reached the South Pole in December 1911.[span_35](start_span)[span_35](end_span)" },
-                    { q: "Which Indian classical dance form originated in Assam?[span_36](start_span)[span_36](end_span)", opts: ["Kathak[span_37](start_span)[span_37](end_span)", "Sattriya[span_38](start_span)[span_38](end_span)", "Kuchipudi[span_39](start_span)[span_39](end_span)", "Mohiniyattam[span_40](start_span)[span_40](end_span)"], ans: 1, exp: "Sattriya developed in Assam and is one of India's classical dance forms.[span_41](start_span)[span_41](end_span)" },
-                    { q: "Which organisation publishes the annual Human Development Report?[span_42](start_span)[span_42](end_span)", opts: ["UNESCO[span_43](start_span)[span_43](end_span)", "UNDP[span_44](start_span)[span_44](end_span)", "UNICEF[span_45](start_span)[span_45](end_span)", "World Bank[span_46](start_span)[span_46](end_span)"], ans: 1, exp: "The United Nations Development Programme publishes the Human Development Report.[span_47](start_span)[span_47](end_span)" },
-                    { q: "The Bretton Woods Conference helped establish which pair of institutions?[span_48](start_span)[span_48](end_span)", opts: ["WHO and UNESCO[span_49](start_span)[span_49](end_span)", "IMF and World Bank[span_50](start_span)[span_50](end_span)", "WTO and ILO[span_51](start_span)[span_51](end_span)", "NATO and OECD[span_52](start_span)[span_52](end_span)"], ans: 1, exp: "The conference laid the foundations for the IMF and International Bank for Reconstruction and Development, part of the World Bank Group.[span_53](start_span)[span_53](end_span)" },
-                    { q: "Which is the only continent crossed by all lines of longitude?[span_54](start_span)[span_54](end_span)", opts: ["Asia[span_55](start_span)[span_55](end_span)", "Africa[span_56](start_span)[span_56](end_span)", "Antarctica[span_57](start_span)[span_57](end_span)", "Europe[span_58](start_span)[span_58](end_span)"], ans: 2, exp: "All meridians meet at the North and South Poles; Antarctica surrounds the South Pole.[span_59](start_span)[span_59](end_span)" },
-                    { q: "Who wrote the historical novel Anandamath?[span_60](start_span)[span_60](end_span)", opts: ["Rabindranath Tagore[span_61](start_span)[span_61](end_span)", "Bankim Chandra Chattopadhyay[span_62](start_span)[span_62](end_span)", "Sarat Chandra Chattopadhyay[span_63](start_span)[span_63](end_span)", "Premchand[span_64](start_span)[span_64](end_span)"], ans: 1, exp: "Bankim Chandra Chattopadhyay wrote 'Anandamath', first published in the 1880s.[span_65](start_span)[span_65](end_span)" },
-                    { q: "Which country gifted the Statue of Liberty to the United States?[span_66](start_span)[span_66](end_span)", opts: ["Spain[span_67](start_span)[span_67](end_span)", "France[span_68](start_span)[span_68](end_span)", "Italy[span_69](start_span)[span_69](end_span)", "Germany[span_70](start_span)[span_70](end_span)"], ans: 1, exp: "France presented the Statue of Liberty to the United States.[span_71](start_span)[span_71](end_span)" },
-                    { q: "What is the currency of South Korea?[span_72](start_span)[span_72](end_span)", opts: ["Yen[span_73](start_span)[span_73](end_span)", "Yuan[span_74](start_span)[span_74](end_span)", "Won[span_75](start_span)[span_75](end_span)", "Ringgit[span_76](start_span)[span_76](end_span)"], ans: 2, exp: "South Korea uses the won.[span_77](start_span)[span_77](end_span)" },
-                    { q: "Which Indian freedom fighter was popularly known as 'Frontier Gandhi'?[span_78](start_span)[span_78](end_span)", opts: ["Maulana Azad[span_79](start_span)[span_79](end_span)", "Khan Abdul Ghaffar Khan[span_80](start_span)[span_80](end_span)", "Lala Lajpat Rai[span_81](start_span)[span_81](end_span)", "Bhagat Singh[span_82](start_span)[span_82](end_span)"], ans: 1, exp: "Khan Abdul Ghaffar Khan was known as Frontier Gandhi.[span_83](start_span)[span_83](end_span)" },
-                    { q: "The headquarters of the International Court of Justice is in which city?[span_84](start_span)[span_84](end_span)", opts: ["Geneva[span_85](start_span)[span_85](end_span)", "New York[span_86](start_span)[span_86](end_span)", "The Hague[span_87](start_span)[span_87](end_span)", "Vienna[span_88](start_span)[span_88](end_span)"], ans: 2, exp: "The International Court of Justice is based in The Hague, Netherlands.[span_89](start_span)[span_89](end_span)" },
-                    { q: "Which Indian monument was built by Maharaja Sawai Pratap Singh?[span_90](start_span)[span_90](end_span)", opts: ["Charminar[span_91](start_span)[span_91](end_span)", "Hawa Mahal[span_92](start_span)[span_92](end_span)", "Victoria Memorial[span_93](start_span)[span_93](end_span)", "Gateway of India[span_94](start_span)[span_94](end_span)"], ans: 1, exp: "Hawa Mahal in Jaipur was commissioned by Sawai Pratap Singh and completed in 1799.[span_95](start_span)[span_95](end_span)" },
-                    { q: "Which sea lies between the Arabian Peninsula and northeastern Africa?[span_96](start_span)[span_96](end_span)", opts: ["Baltic Sea[span_97](start_span)[span_97](end_span)", "Red Sea[span_98](start_span)[span_98](end_span)", "Black Sea[span_99](start_span)[span_99](end_span)", "Caspian Sea[span_100](start_span)[span_100](end_span)"], ans: 1, exp: "The Red Sea separates the Arabian Peninsula from northeastern Africa.[span_101](start_span)[span_101](end_span)" },
-                    { q: "Who was the first Indian to win an individual Olympic gold medal?[span_102](start_span)[span_102](end_span)", opts: ["Neeraj Chopra[span_103](start_span)[span_103](end_span)", "Abhinav Bindra[span_104](start_span)[span_104](end_span)", "Rajyavardhan Rathore[span_105](start_span)[span_105](end_span)", "Leander Paes[span_106](start_span)[span_106](end_span)"], ans: 1, exp: "Abhinav Bindra won the 10 m air rifle gold at the 2008 Beijing Olympics.[span_107](start_span)[span_107](end_span)" },
-                    { q: "Which planet is named after the Roman god of war?[span_108](start_span)[span_108](end_span)", opts: ["Venus[span_109](start_span)[span_109](end_span)", "Mars[span_110](start_span)[span_110](end_span)", "Jupiter[span_111](start_span)[span_111](end_span)", "Mercury[span_112](start_span)[span_112](end_span)"], ans: 1, exp: "Mars is named after the Roman god of war.[span_113](start_span)[span_113](end_span)" },
-                    { q: "Which Indian state is home to the living root bridges made by training tree roots?[span_114](start_span)[span_114](end_span)", opts: ["Sikkim[span_115](start_span)[span_115](end_span)", "Meghalaya[span_116](start_span)[span_116](end_span)", "Nagaland[span_117](start_span)[span_117](end_span)", "Tripura[span_118](start_span)[span_118](end_span)"], ans: 1, exp: "Living root bridges are especially associated with Meghalaya.[span_119](start_span)[span_119](end_span)" }
-                ],
-                flashcards: [
-                    { q: "What is the national motto of India?[span_120](start_span)[span_120](end_span)", a: "Satyameva Jayate, meaning 'Truth alone triumphs.[span_121](start_span)'[span_121](end_span)" },
-                    { q: "Who was the first Indian woman to climb Mount Everest?[span_122](start_span)[span_122](end_span)", a: "Bachendri Pal, in 1984.[span_123](start_span)[span_123](end_span)" },
-                    { q: "Where is the headquarters of the World Health Organization?[span_124](start_span)[span_124](end_span)", a: "Geneva, Switzerland.[span_125](start_span)[span_125](end_span)" },
-                    { q: "Which is the largest hot desert in the world?[span_126](start_span)[span_126](end_span)", a: "The Sahara Desert.[span_127](start_span)[span_127](end_span)" },
-                    { q: "Who composed India's national song, 'Vande Mataram'?[span_128](start_span)[span_128](end_span)", a: "Bankim Chandra Chattopadhyay.[span_129](start_span)[span_129](end_span)" }
-                ]
-            },
-            2: {
-                questions: [
-                    { q: "Which treaty formally ended the state of war between Germany and the Allied Powers after World War I?[span_130](start_span)[span_130](end_span)", opts: ["Treaty of Utrecht[span_131](start_span)[span_131](end_span)", "Treaty of Versailles[span_132](start_span)[span_132](end_span)", "Treaty of Tordesillas[span_133](start_span)[span_133](end_span)", "Treaty of Paris (1783)[span_134](start_span)[span_134](end_span)"], ans: 1, exp: "The Treaty of Versailles was signed in 1919.[span_135](start_span)[span_135](end_span)" },
-                    { q: "Which Indian ruler is associated with the construction of the Grand Trunk Road in its major medieval form?[span_136](start_span)[span_136](end_span)", opts: ["Akbar[span_137](start_span)[span_137](end_span)", "Sher Shah Suri[span_138](start_span)[span_138](end_span)", "Alauddin Khalji[span_139](start_span)[span_139](end_span)", "Chandragupta Maurya[span_140](start_span)[span_140](end_span)"], ans: 1, exp: "Sher Shah Suri improved and extended the road network that became the Grand Trunk Road.[span_141](start_span)[span_141](end_span)" },
-                    { q: "Which strait separates Asia from North America?[span_142](start_span)[span_142](end_span)", opts: ["Strait of Malacca[span_143](start_span)[span_143](end_span)", "Bering Strait[span_144](start_span)[span_144](end_span)", "Strait of Gibraltar[span_145](start_span)[span_145](end_span)", "Bosporus[span_146](start_span)[span_146](end_span)"], ans: 1, exp: "The Bering Strait lies between Russia and Alaska.[span_147](start_span)[span_147](end_span)" },
-                    { q: "Who was the first Secretary-General of the United Nations?[span_148](start_span)[span_148](end_span)", opts: ["Dag Hammarskjöld[span_149](start_span)[span_149](end_span)", "Trygve Lie[span_150](start_span)[span_150](end_span)", "U Thant[span_151](start_span)[span_151](end_span)", "Kurt Waldheim[span_152](start_span)[span_152](end_span)"], ans: 1, exp: "Norwegian diplomat Trygve Lie served from 1946 to 1952.[span_153](start_span)[span_153](end_span)" },
-                    { q: "The 'Blue Economy' mainly concerns the sustainable use of which environment?[span_154](start_span)[span_154](end_span)", opts: ["Deserts[span_155](start_span)[span_155](end_span)", "Oceans and coastal resources[span_156](start_span)[span_156](end_span)", "Mountain forests[span_157](start_span)[span_157](end_span)", "Polar ice sheets[span_158](start_span)[span_158](end_span)"], ans: 1, exp: "The Blue Economy focuses on sustainable ocean-based economic activity.[span_159](start_span)[span_159](end_span)" },
-                    { q: "Which Indian mathematician is associated with the number 1729 and the Hardy-Ramanujan story?[span_160](start_span)[span_160](end_span)", opts: ["Aryabhata[span_161](start_span)[span_161](end_span)", "Srinivasa Ramanujan[span_162](start_span)[span_162](end_span)", "Bhaskara II[span_163](start_span)[span_163](end_span)", "Brahmagupta[span_164](start_span)[span_164](end_span)"], ans: 1, exp: "1729 is known as the Hardy-Ramanujan number.[span_165](start_span)[span_165](end_span)" },
-                    { q: "Which country was formerly known as Abyssinia?[span_166](start_span)[span_166](end_span)", opts: ["Eritrea[span_167](start_span)[span_167](end_span)", "Ethiopia[span_168](start_span)[span_168](end_span)", "Somalia[span_169](start_span)[span_169](end_span)", "Sudan[span_170](start_span)[span_170](end_span)"], ans: 1, exp: "Abyssinia was a historical name for Ethiopia.[span_171](start_span)[span_171](end_span)" },
-                    { q: "Which Indian city is widely known as the 'Pink City'?[span_172](start_span)[span_172](end_span)", opts: ["Jodhpur[span_173](start_span)[span_173](end_span)", "Jaipur[span_174](start_span)[span_174](end_span)", "Udaipur[span_175](start_span)[span_175](end_span)", "Bikaner[span_176](start_span)[span_176](end_span)"], ans: 1, exp: "Jaipur is commonly called the Pink City.[span_177](start_span)[span_177](end_span)" },
-                    { q: "What is the name of the world's largest coral reef system?[span_178](start_span)[span_178](end_span)", opts: ["Belize Barrier Reef[span_179](start_span)[span_179](end_span)", "Great Barrier Reef[span_180](start_span)[span_180](end_span)", "Red Sea Reef[span_181](start_span)[span_181](end_span)", "New Caledonia Barrier Reef[span_182](start_span)[span_182](end_span)"], ans: 1, exp: "The Great Barrier Reef lies off Queensland, Australia.[span_183](start_span)[span_183](end_span)" },
-                    { q: "Which philosopher was the teacher of Alexander the Great?[span_184](start_span)[span_184](end_span)", opts: ["Socrates[span_185](start_span)[span_185](end_span)", "Aristotle[span_186](start_span)[span_186](end_span)", "Plato[span_187](start_span)[span_187](end_span)", "Pythagoras[span_188](start_span)[span_188](end_span)"], ans: 1, exp: "Aristotle tutored Alexander during his youth.[span_189](start_span)[span_189](end_span)" },
-                    { q: "Which Indian constitutional article abolishes untouchability?[span_190](start_span)[span_190](end_span)", opts: ["Article 14[span_191](start_span)[span_191](end_span)", "Article 17[span_192](start_span)[span_192](end_span)", "Article 19[span_193](start_span)[span_193](end_span)", "Article 21[span_194](start_span)[span_194](end_span)"], ans: 1, exp: "Article 17 abolishes untouchability.[span_195](start_span)[span_195](end_span)" },
-                    { q: "Which country has the city of Samarkand, a historic Silk Road centre?[span_196](start_span)[span_196](end_span)", opts: ["Uzbekistan[span_197](start_span)[span_197](end_span)", "Mongolia[span_198](start_span)[span_198](end_span)", "Iran[span_199](start_span)[span_199](end_span)", "Nepal[span_200](start_span)[span_200](end_span)"], ans: 0, exp: "Samarkand is in Uzbekistan.[span_201](start_span)[span_201](end_span)" },
-                    { q: "Which is the smallest independent country in the world by area?[span_202](start_span)[span_202](end_span)", opts: ["Monaco[span_203](start_span)[span_203](end_span)", "San Marino[span_204](start_span)[span_204](end_span)", "Vatican City[span_205](start_span)[span_205](end_span)", "Liechtenstein[span_206](start_span)[span_206](end_span)"], ans: 2, exp: "Vatican City is the world's smallest sovereign state by area.[span_207](start_span)[span_207](end_span)" },
-                    { q: "Who was the first Indian woman to win an Olympic medal?[span_208](start_span)[span_208](end_span)", opts: ["P. T. Usha[span_209](start_span)[span_209](end_span)", "Karnam Malleswari[span_210](start_span)[span_210](end_span)", "Mary Kom[span_211](start_span)[span_211](end_span)", "Saina Nehwal[span_212](start_span)[span_212](end_span)"], ans: 1, exp: "Karnam Malleswari won bronze in weightlifting at the 2000 Sydney Olympics.[span_213](start_span)[span_213](end_span)" },
-                    { q: "Which instrument measures atmospheric pressure?[span_214](start_span)[span_214](end_span)", opts: ["Hygrometer[span_215](start_span)[span_215](end_span)", "Barometer[span_216](start_span)[span_216](end_span)", "Anemometer[span_217](start_span)[span_217](end_span)", "Seismograph[span_218](start_span)[span_218](end_span)"], ans: 1, exp: "A barometer measures atmospheric pressure.[span_219](start_span)[span_219](end_span)" },
-                    { q: "The ancient library of Alexandria was located in which country?[span_220](start_span)[span_220](end_span)", opts: ["Greece[span_221](start_span)[span_221](end_span)", "Egypt[span_222](start_span)[span_222](end_span)", "Turkey[span_223](start_span)[span_223](end_span)", "Italy[span_224](start_span)[span_224](end_span)"], ans: 1, exp: "Alexandria is a Mediterranean port city in Egypt.[span_225](start_span)[span_225](end_span)" },
-                    { q: "Which Indian state has the largest area?[span_226](start_span)[span_226](end_span)", opts: ["Madhya Pradesh[span_227](start_span)[span_227](end_span)", "Maharashtra[span_228](start_span)[span_228](end_span)", "Rajasthan[span_229](start_span)[span_229](end_span)", "Uttar Pradesh[span_230](start_span)[span_230](end_span)"], ans: 2, exp: "Rajasthan is India's largest state by area.[span_231](start_span)[span_231](end_span)" },
-                    { q: "Which organisation administers the Nobel Peace Prize?[span_232](start_span)[span_232](end_span)", opts: ["Swedish Academy[span_233](start_span)[span_233](end_span)", "Norwegian Nobel Committee[span_234](start_span)[span_234](end_span)", "UNESCO[span_235](start_span)[span_235](end_span)", "European Parliament[span_236](start_span)[span_236](end_span)"], ans: 1, exp: "The Norwegian Nobel Committee awards the Nobel Peace Prize.[span_237](start_span)[span_237](end_span)" },
-                    { q: "What is the study of flags called?[span_238](start_span)[span_238](end_span)", opts: ["Numismatics[span_239](start_span)[span_239](end_span)", "Vexillology[span_240](start_span)[span_240](end_span)", "Heraldry[span_241](start_span)[span_241](end_span)", "Paleography[span_242](start_span)[span_242](end_span)"], ans: 1, exp: "Vexillology is the study of flags.[span_243](start_span)[span_243](end_span)" },
-                    { q: "Which river flows through Baghdad?[span_244](start_span)[span_244](end_span)", opts: ["Nile[span_245](start_span)[span_245](end_span)", "Tigris[span_246](start_span)[span_246](end_span)", "Jordan[span_247](start_span)[span_247](end_span)", "Euphrates only[span_248](start_span)[span_248](end_span)"], ans: 1, exp: "The Tigris flows through Baghdad; the Euphrates flows west of the city.[span_249](start_span)[span_249](end_span)" }
-                ],
-                flashcards: [
-                    { q: "What is the capital of Bhutan?[span_250](start_span)[span_250](end_span)", a: "Thimphu.[span_251](start_span)[span_251](end_span)" },
-                    { q: "Who founded the Maurya Empire?[span_252](start_span)[span_252](end_span)", a: "Chandragupta Maurya.[span_253](start_span)[span_253](end_span)" },
-                    { q: "Which gas is commonly called laughing gas?[span_254](start_span)[span_254](end_span)", a: "Nitrous oxide (N2O).[span_255](start_span)[span_255](end_span)" },
-                    { q: "What is the official residence of the President of India?[span_256](start_span)[span_256](end_span)", a: "Rashtrapati Bhavan, New Delhi.[span_257](start_span)[span_257](end_span)" },
-                    { q: "Which is the deepest known ocean trench?[span_258](start_span)[span_258](end_span)", a: "The Mariana Trench in the western Pacific Ocean.[span_259](start_span)[span_259](end_span)" }
-                ]
-            },
-            3: {
-                 questions: [
-                    { q: "Which agreement created the European Economic Community in 1957?[span_260](start_span)[span_260](end_span)", opts: ["Maastricht Treaty[span_261](start_span)[span_261](end_span)", "Treaty of Rome[span_262](start_span)[span_262](end_span)", "Treaty of Lisbon[span_263](start_span)[span_263](end_span)", "Schengen Agreement[span_264](start_span)[span_264](end_span)"], ans: 1, exp: "The Treaty of Rome established the European Economic Community in 1957.[span_265](start_span)[span_265](end_span)" },
-                    { q: "Which Indian ruler built the Vijay Stambha at Chittorgarh?[span_266](start_span)[span_266](end_span)", opts: ["Rana Sanga[span_267](start_span)[span_267](end_span)", "Rana Kumbha[span_268](start_span)[span_268](end_span)", "Maharana Pratap[span_269](start_span)[span_269](end_span)", "Bappa Rawal[span_270](start_span)[span_270](end_span)"], ans: 1, exp: "Rana Kumbha built the Tower of Victory in the 15th century.[span_271](start_span)[span_271](end_span)" },
-                    { q: "Which country contains the historical region of Transylvania?[span_272](start_span)[span_272](end_span)", opts: ["Hungary[span_273](start_span)[span_273](end_span)", "Romania[span_274](start_span)[span_274](end_span)", "Bulgaria[span_275](start_span)[span_275](end_span)", "Serbia[span_276](start_span)[span_276](end_span)"], ans: 1, exp: "Transylvania is a region in central Romania.[span_277](start_span)[span_277](end_span)" },
-                    { q: "Which is the world's largest inland body of water by surface area?[span_278](start_span)[span_278](end_span)", opts: ["Lake Superior[span_279](start_span)[span_279](end_span)", "Caspian Sea[span_280](start_span)[span_280](end_span)", "Lake Baikal[span_281](start_span)[span_281](end_span)", "Lake Victoria[span_282](start_span)[span_282](end_span)"], ans: 1, exp: "The Caspian Sea is the largest inland body of water.[span_283](start_span)[span_283](end_span)" },
-                    { q: "Lake Victoria is a major source region for which river system?[span_284](start_span)[span_284](end_span)", opts: ["Congo[span_285](start_span)[span_285](end_span)", "White Nile[span_286](start_span)[span_286](end_span)", "Niger[span_287](start_span)[span_287](end_span)", "Zambezi[span_288](start_span)[span_288](end_span)"], ans: 1, exp: "The White Nile's source region includes Lake Victoria.[span_289](start_span)[span_289](end_span)" },
-                    { q: "Who was the first woman to fly solo across the Atlantic Ocean?[span_290](start_span)[span_290](end_span)", opts: ["Bessie Coleman[span_291](start_span)[span_291](end_span)", "Amelia Earhart[span_292](start_span)[span_292](end_span)", "Valentina Tereshkova[span_293](start_span)[span_293](end_span)", "Jacqueline Cochran[span_294](start_span)[span_294](end_span)"], ans: 1, exp: "Amelia Earhart made the solo transatlantic flight in 1932.[span_295](start_span)[span_295](end_span)" },
-                    { q: "Which Indian state is associated with the Hornbill Festival?[span_296](start_span)[span_296](end_span)", opts: ["Manipur[span_297](start_span)[span_297](end_span)", "Nagaland[span_298](start_span)[span_298](end_span)", "Mizoram[span_299](start_span)[span_299](end_span)", "Arunachal Pradesh[span_300](start_span)[span_300](end_span)"], ans: 1, exp: "Nagaland hosts the Hornbill Festival each December.[span_301](start_span)[span_301](end_span)" },
-                    { q: "Which South American country has French Guiana as a neighbouring territory across its land border?[span_302](start_span)[span_302](end_span)", opts: ["Chile[span_303](start_span)[span_303](end_span)", "Brazil[span_304](start_span)[span_304](end_span)", "Peru[span_305](start_span)[span_305](end_span)", "Ecuador[span_306](start_span)[span_306](end_span)"], ans: 1, exp: "Brazil shares a land border with French Guiana, an overseas department of France.[span_307](start_span)[span_307](end_span)" },
-                    { q: "Which ancient civilisation developed cuneiform writing?[span_308](start_span)[span_308](end_span)", opts: ["Maya[span_309](start_span)[span_309](end_span)", "Sumerian[span_310](start_span)[span_310](end_span)", "Inca[span_311](start_span)[span_311](end_span)", "Phoenician only[span_312](start_span)[span_312](end_span)"], ans: 1, exp: "Cuneiform developed in ancient Mesopotamia, especially among the Sumerians.[span_313](start_span)[span_313](end_span)" },
-                    { q: "Which Indian state has the largest forest cover by area, according to commonly cited Forest Survey of India reports?[span_314](start_span)[span_314](end_span)", opts: ["Kerala[span_315](start_span)[span_315](end_span)", "Madhya Pradesh[span_316](start_span)[span_316](end_span)", "Punjab[span_317](start_span)[span_317](end_span)", "Haryana[span_318](start_span)[span_318](end_span)"], ans: 1, exp: "Madhya Pradesh has generally ranked first by forest cover area.[span_319](start_span)[span_319](end_span)" },
-                    { q: "Who wrote The Discovery of India?[span_320](start_span)[span_320](end_span)", opts: ["Sardar Patel[span_321](start_span)[span_321](end_span)", "Jawaharlal Nehru[span_322](start_span)[span_322](end_span)", "B. R. Ambedkar[span_323](start_span)[span_323](end_span)", "Subhas Chandra Bose[span_324](start_span)[span_324](end_span)"], ans: 1, exp: "Nehru wrote the book while imprisoned during the 1940s.[span_325](start_span)[span_325](end_span)" },
-                    { q: "Which country's parliament is known as the Knesset?[span_326](start_span)[span_326](end_span)", opts: ["Greece[span_327](start_span)[span_327](end_span)", "Israel[span_328](start_span)[span_328](end_span)", "Turkey[span_329](start_span)[span_329](end_span)", "Lebanon[span_330](start_span)[span_330](end_span)"], ans: 1, exp: "The Knesset is Israel's unicameral parliament.[span_331](start_span)[span_331](end_span)" },
-                    { q: "What is the SI-derived unit of catalytic activity?[span_332](start_span)[span_332](end_span)", opts: ["Tesla[span_333](start_span)[span_333](end_span)", "Katal[span_334](start_span)[span_334](end_span)", "Weber[span_335](start_span)[span_335](end_span)", "Becquerel[span_336](start_span)[span_336](end_span)"], ans: 1, exp: "The katal measures catalytic activity.[span_337](start_span)[span_337](end_span)" },
-                    { q: "Which body of water connects the Red Sea to the Gulf of Aden?[span_338](start_span)[span_338](end_span)", opts: ["Strait of Hormuz[span_339](start_span)[span_339](end_span)", "Bab-el-Mandeb Strait[span_340](start_span)[span_340](end_span)", "Strait of Malacca[span_341](start_span)[span_341](end_span)", "Dardanelles[span_342](start_span)[span_342](end_span)"], ans: 1, exp: "Bab-el-Mandeb lies between Yemen and the Horn of Africa.[span_343](start_span)[span_343](end_span)" },
-                    { q: "Which Indian classical musician was awarded the Bharat Ratna in 1998?[span_344](start_span)[span_344](end_span)", opts: ["Ravi Shankar[span_345](start_span)[span_345](end_span)", "M. S. Subbulakshmi[span_346](start_span)[span_346](end_span)", "Bismillah Khan[span_347](start_span)[span_347](end_span)", "Bhimsen Joshi[span_348](start_span)[span_348](end_span)"], ans: 1, exp: "Carnatic vocalist M. S. Subbulakshmi received the Bharat Ratna in 1998.[span_349](start_span)[span_349](end_span)" },
-                    { q: "Which country is home to the ancient city of Timbuktu?[span_350](start_span)[span_350](end_span)", opts: ["Niger[span_351](start_span)[span_351](end_span)", "Mali[span_352](start_span)[span_352](end_span)", "Chad[span_353](start_span)[span_353](end_span)", "Senegal[span_354](start_span)[span_354](end_span)"], ans: 1, exp: "Timbuktu is a historic city in Mali.[span_355](start_span)[span_355](end_span)" },
-                    { q: "Which branch of the United Nations system publishes the World Economic Situation and Prospects report with UN DESA?[span_356](start_span)[span_356](end_span)", opts: ["UNDP alone[span_357](start_span)[span_357](end_span)", "UN DESA with UNCTAD and other partners[span_358](start_span)[span_358](end_span)", "UNICEF[span_359](start_span)[span_359](end_span)", "WHO[span_360](start_span)[span_360](end_span)"], ans: 1, exp: "The report is prepared by UN DESA with partner organisations including UNCTAD.[span_361](start_span)[span_361](end_span)" },
-                    { q: "Which Indian state is famous for the Sun Temple at Konark?[span_362](start_span)[span_362](end_span)", opts: ["Odisha[span_363](start_span)[span_363](end_span)", "Bihar[span_364](start_span)[span_364](end_span)", "Gujarat[span_365](start_span)[span_365](end_span)", "Maharashtra[span_366](start_span)[span_366](end_span)"], ans: 0, exp: "The Konark Sun Temple is in Odisha.[span_367](start_span)[span_367](end_span)" },
-                    { q: "Which country has the world's longest international land border with the United States?[span_368](start_span)[span_368](end_span)", opts: ["Mexico[span_369](start_span)[span_369](end_span)", "Canada[span_370](start_span)[span_370](end_span)", "Russia[span_371](start_span)[span_371](end_span)", "Cuba[span_372](start_span)[span_372](end_span)"], ans: 1, exp: "The Canada-United States border is the world's longest international land border.[span_373](start_span)[span_373](end_span)" },
-                    { q: "What is the capital of Kazakhstan?[span_374](start_span)[span_374](end_span)", opts: ["Almaty[span_375](start_span)[span_375](end_span)", "Astana[span_376](start_span)[span_376](end_span)", "Tashkent[span_377](start_span)[span_377](end_span)", "Bishkek[span_378](start_span)[span_378](end_span)"], ans: 1, exp: "Kazakhstan's capital is Astana.[span_379](start_span)[span_379](end_span)" }
-                ],
-                flashcards: [
-                    { q: "What is the capital of Laos?[span_380](start_span)[span_380](end_span)", a: "Vientiane.[span_381](start_span)[span_381](end_span)" },
-                    { q: "Which civilisation built Machu Picchu?[span_382](start_span)[span_382](end_span)", a: "The Inca civilisation.[span_383](start_span)[span_383](end_span)" },
-                    { q: "What does UNESCO stand for?[span_384](start_span)[span_384](end_span)", a: "United Nations Educational, Scientific and Cultural Organization.[span_385](start_span)[span_385](end_span)" },
-                    { q: "Which is the largest island in the world, excluding continents?[span_386](start_span)[span_386](end_span)", a: "Greenland.[span_387](start_span)[span_387](end_span)" },
-                    { q: "What is the currency of Switzerland?[span_388](start_span)[span_388](end_span)", a: "The Swiss franc.[span_389](start_span)[span_389](end_span)" }
-                ]
-            },
-            4: {
-                 questions: [
-                    { q: "Which international agreement aims to protect the ozone layer?[span_390](start_span)[span_390](end_span)", opts: ["Kyoto Protocol[span_391](start_span)[span_391](end_span)", "Montreal Protocol[span_392](start_span)[span_392](end_span)", "Paris Agreement[span_393](start_span)[span_393](end_span)", "Ramsar Convention[span_394](start_span)[span_394](end_span)"], ans: 1, exp: "The Montreal Protocol controls ozone-depleting substances.[span_395](start_span)[span_395](end_span)" },
-                    { q: "Which Indian freedom movement began with Gandhi's Dandi March in 1930?[span_396](start_span)[span_396](end_span)", opts: ["Quit India Movement[span_397](start_span)[span_397](end_span)", "Civil Disobedience Movement[span_398](start_span)[span_398](end_span)", "Swadeshi Movement[span_399](start_span)[span_399](end_span)", "Champaran Satyagraha[span_400](start_span)[span_400](end_span)"], ans: 1, exp: "The Dandi March launched a major phase of the Civil Disobedience Movement.[span_401](start_span)[span_401](end_span)" },
-                    { q: "Which is the only country that lies in all four hemispheres?[span_402](start_span)[span_402](end_span)", opts: ["Indonesia[span_403](start_span)[span_403](end_span)", "Kiribati[span_404](start_span)[span_404](end_span)", "Ecuador[span_405](start_span)[span_405](end_span)", "Maldives[span_406](start_span)[span_406](end_span)"], ans: 1, exp: "Kiribati spans the Equator and both sides of the 180° meridian.[span_407](start_span)[span_407](end_span)" },
-                    { q: "Which empire built the road network known as the Royal Road in the ancient Near East?[span_408](start_span)[span_408](end_span)", opts: ["Roman Empire[span_409](start_span)[span_409](end_span)", "Achaemenid Persian Empire[span_410](start_span)[span_410](end_span)", "Ottoman Empire[span_411](start_span)[span_411](end_span)", "Byzantine Empire[span_412](start_span)[span_412](end_span)"], ans: 1, exp: "The Achaemenid Persians developed the Royal Road to aid communication and administration.[span_413](start_span)[span_413](end_span)" },
-                    { q: "Who was the first Indian woman to win the Booker Prize?[span_414](start_span)[span_414](end_span)", opts: ["Kiran Desai[span_415](start_span)[span_415](end_span)", "Arundhati Roy[span_416](start_span)[span_416](end_span)", "Jhumpa Lahiri[span_417](start_span)[span_417](end_span)", "Anita Desai[span_418](start_span)[span_418](end_span)"], ans: 1, exp: "Arundhati Roy won the Booker Prize in 1997 for 'The God of Small Things'.[span_419](start_span)[span_419](end_span)" },
-                    { q: "Which Indian state is home to the Keibul Lamjao, the world's only floating national park?[span_420](start_span)[span_420](end_span)", opts: ["Assam[span_421](start_span)[span_421](end_span)", "Manipur[span_422](start_span)[span_422](end_span)", "Meghalaya[span_423](start_span)[span_423](end_span)", "Sikkim[span_424](start_span)[span_424](end_span)"], ans: 1, exp: "Keibul Lamjao National Park is on Loktak Lake in Manipur.[span_425](start_span)[span_425](end_span)" },
-                    { q: "Which is the largest moon of Saturn?[span_426](start_span)[span_426](end_span)", opts: ["Enceladus[span_427](start_span)[span_427](end_span)", "Titan[span_428](start_span)[span_428](end_span)", "Rhea[span_429](start_span)[span_429](end_span)", "Iapetus[span_430](start_span)[span_430](end_span)"], ans: 1, exp: "Titan is Saturn's largest moon.[span_431](start_span)[span_431](end_span)" },
-                    { q: "Which Indian musician became the first musician to receive the Bharat Ratna?[span_432](start_span)[span_432](end_span)", opts: ["Ravi Shankar[span_433](start_span)[span_433](end_span)", "M. S. Subbulakshmi[span_434](start_span)[span_434](end_span)", "Lata Mangeshkar[span_435](start_span)[span_435](end_span)", "Bismillah Khan[span_436](start_span)[span_436](end_span)"], ans: 1, exp: "M. S. Subbulakshmi received the Bharat Ratna in 1998, before other musicians listed here.[span_437](start_span)[span_437](end_span)" },
-                    { q: "Which country is associated with the ancient city of Carthage?[span_438](start_span)[span_438](end_span)", opts: ["Greece[span_439](start_span)[span_439](end_span)", "Tunisia[span_440](start_span)[span_440](end_span)", "Libya[span_441](start_span)[span_441](end_span)", "Morocco[span_442](start_span)[span_442](end_span)"], ans: 1, exp: "Carthage was an ancient city near modern Tunis, Tunisia.[span_443](start_span)[span_443](end_span)" },
-                    { q: "Which Indian constitutional body conducts elections to Parliament and state legislatures?[span_444](start_span)[span_444](end_span)", opts: ["UPSC[span_445](start_span)[span_445](end_span)", "Election Commission of India[span_446](start_span)[span_446](end_span)", "Finance Commission[span_447](start_span)[span_447](end_span)", "NITI Aayog[span_448](start_span)[span_448](end_span)"], ans: 1, exp: "The Election Commission of India administers elections to Parliament and state legislatures.[span_449](start_span)[span_449](end_span)" },
-                    { q: "Which strait connects the Persian Gulf with the Gulf of Oman?[span_450](start_span)[span_450](end_span)", opts: ["Bab-el-Mandeb[span_451](start_span)[span_451](end_span)", "Strait of Hormuz[span_452](start_span)[span_452](end_span)", "Sunda Strait[span_453](start_span)[span_453](end_span)", "Taiwan Strait[span_454](start_span)[span_454](end_span)"], ans: 1, exp: "The Strait of Hormuz is a key passage between the Persian Gulf and Gulf of Oman.[span_455](start_span)[span_455](end_span)" },
-                    { q: "Which scientist proposed the uncertainty principle?[span_456](start_span)[span_456](end_span)", opts: ["Niels Bohr[span_457](start_span)[span_457](end_span)", "Werner Heisenberg[span_458](start_span)[span_458](end_span)", "Max Planck[span_459](start_span)[span_459](end_span)", "Erwin Schrödinger[span_460](start_span)[span_460](end_span)"], ans: 1, exp: "Werner Heisenberg formulated the uncertainty principle.[span_461](start_span)[span_461](end_span)" },
-                    { q: "Which is the largest gland in the human body?[span_462](start_span)[span_462](end_span)", opts: ["Pancreas[span_463](start_span)[span_463](end_span)", "Liver[span_464](start_span)[span_464](end_span)", "Thyroid[span_465](start_span)[span_465](end_span)", "Pituitary[span_466](start_span)[span_466](end_span)"], ans: 1, exp: "The liver is the largest gland in the human body.[span_467](start_span)[span_467](end_span)" },
-                    { q: "Which country's national legislature is called the Diet?[span_468](start_span)[span_468](end_span)", opts: ["China[span_469](start_span)[span_469](end_span)", "Japan[span_470](start_span)[span_470](end_span)", "South Korea[span_471](start_span)[span_471](end_span)", "Thailand[span_472](start_span)[span_472](end_span)"], ans: 1, exp: "Japan's national legislature is called the National Diet.[span_473](start_span)[span_473](end_span)" },
-                    { q: "Which Indian state is famous for the classical dance form Mohiniyattam?[span_474](start_span)[span_474](end_span)", opts: ["Tamil Nadu[span_475](start_span)[span_475](end_span)", "Kerala[span_476](start_span)[span_476](end_span)", "Andhra Pradesh[span_477](start_span)[span_477](end_span)", "Odisha[span_478](start_span)[span_478](end_span)"], ans: 1, exp: "Mohiniyattam is a classical dance form from Kerala.[span_479](start_span)[span_479](end_span)" },
-                    { q: "What is the world's largest active volcano by volume and area?[span_480](start_span)[span_480](end_span)", opts: ["Mount Etna[span_481](start_span)[span_481](end_span)", "Mauna Loa[span_482](start_span)[span_482](end_span)", "Mount Fuji[span_483](start_span)[span_483](end_span)", "Mount Vesuvius[span_484](start_span)[span_484](end_span)"], ans: 1, exp: "Mauna Loa in Hawaii is generally described as the largest active volcano by volume and area.[span_485](start_span)[span_485](end_span)" },
-                    { q: "Which Indian scientist is known for the Raman Effect?[span_486](start_span)[span_486](end_span)", opts: ["Homi J. Bhabha[span_487](start_span)[span_487](end_span)", "C. V. Raman[span_488](start_span)[span_488](end_span)", "S. N. Bose[span_489](start_span)[span_489](end_span)", "Vikram Sarabhai[span_490](start_span)[span_490](end_span)"], ans: 1, exp: "C. V. Raman discovered the light-scattering effect that bears his name.[span_491](start_span)[span_491](end_span)" },
-                    { q: "Which international organisation is responsible for setting global civil aviation standards?[span_492](start_span)[span_492](end_span)", opts: ["IMO[span_493](start_span)[span_493](end_span)", "ICAO[span_494](start_span)[span_494](end_span)", "IAEA[span_495](start_span)[span_495](end_span)", "ITU[span_496](start_span)[span_496](end_span)"], ans: 1, exp: "The International Civil Aviation Organization develops international civil aviation standards.[span_497](start_span)[span_497](end_span)" },
-                    { q: "Which river is known as the 'Sorrow of Bihar' because of recurring floods?[span_498](start_span)[span_498](end_span)", opts: ["Gandak[span_499](start_span)[span_499](end_span)", "Kosi[span_500](start_span)[span_500](end_span)", "Son[span_501](start_span)[span_501](end_span)", "Damodar[span_502](start_span)[span_502](end_span)"], ans: 1, exp: "The Kosi River is often called the Sorrow of Bihar.[span_503](start_span)[span_503](end_span)" },
-                    { q: "Which country hosted the first modern Olympic Games in 1896?[span_504](start_span)[span_504](end_span)", opts: ["France[span_505](start_span)[span_505](end_span)", "Greece[span_506](start_span)[span_506](end_span)", "United Kingdom[span_507](start_span)[span_507](end_span)", "Italy[span_508](start_span)[span_508](end_span)"], ans: 1, exp: "The first modern Olympics were held in Athens, Greece, in 1896.[span_509](start_span)[span_509](end_span)" }
-                ],
-                flashcards: [
-                    { q: "What is the capital of Kyrgyzstan?[span_510](start_span)[span_510](end_span)", a: "Bishkek.[span_511](start_span)[span_511](end_span)" },
-                    { q: "Which Indian scientist won the Nobel Prize in Physics in 1930?[span_512](start_span)[span_512](end_span)", a: "C. V. Raman.[span_513](start_span)[span_513](end_span)" },
-                    { q: "What is the study of coins called?[span_514](start_span)[span_514](end_span)", a: "Numismatics.[span_515](start_span)[span_515](end_span)" },
-                    { q: "Which treaty established the European Union in its modern form?[span_516](start_span)[span_516](end_span)", a: "The Maastricht Treaty, signed in 1992.[span_517](start_span)[span_517](end_span)" },
-                    { q: "Which is the largest planet in our Solar System?[span_518](start_span)[span_518](end_span)", a: "Jupiter.[span_519](start_span)[span_519](end_span)" }
-                ]
-            }
-        };
-
-        // State Variables
-        let currentTestId = 1;
-        let currentQuestionIndex = 0;
-        let userAnswers = {};
-
-        function switchScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-        }
-
-        function startTest(testId) {
-            currentTestId = testId;
-            currentQuestionIndex = 0;
-            userAnswers = {}; // Reset answers
+        // Function to open the tests screen for a specific subject
+        function openSubject(subjectName) {
+            // Update the title
+            subjectTitle.textContent = subjectName;
             
-            document.getElementById('quiz-title').innerText = `Test ${testId}`;
-            setupNavGrid();
-            renderQuestion();
-            switchScreen('screen-quiz');
-        }
-
-        function setupNavGrid() {
-            const grid = document.getElementById('nav-grid');
-            grid.innerHTML = '';
-            for (let i = 0; i < 20; i++) {
-                const box = document.createElement('div');
-                box.className = 'nav-box';
-                box.innerText = i + 1;
-                box.onclick = () => goToQuestion(i);
-                grid.appendChild(box);
-            }
-        }
-
-        function renderQuestion() {
-            const data = gkData[currentTestId].questions[currentQuestionIndex];
+            // Hide Home, Show Tests
+            homeScreen.classList.remove('active');
             
-            // Format citations gracefully
-            document.getElementById('q-text').innerHTML = formatCitations(data.q);
-            document.getElementById('current-q-num').innerText = currentQuestionIndex + 1;
+            // Slight delay to allow animation to feel smooth
+            setTimeout(() => {
+                testsScreen.classList.add('active');
+            }, 50);
+        }
+
+        // Function to go back to the home screen
+        function goBack() {
+            // Hide Tests, Show Home
+            testsScreen.classList.remove('active');
             
-            const optionsContainer = document.getElementById('options-container');
-            optionsContainer.innerHTML = '';
-            
-            data.opts.forEach((opt, index) => {
-                const btn = document.createElement('button');
-                btn.className = `option-btn ${userAnswers[currentQuestionIndex] === index ? 'selected' : ''}`;
-                btn.innerHTML = formatCitations(opt);
-                btn.onclick = () => selectOption(index);
-                optionsContainer.appendChild(btn);
-            });
-
-            // Reset UI States
-            document.getElementById('explanation-container').classList.remove('visible');
-            updateNavGrid();
-            
-            // Buttons
-            document.getElementById('btn-prev').disabled = currentQuestionIndex === 0;
-            document.getElementById('btn-next').disabled = currentQuestionIndex === 19;
-            
-            if (currentQuestionIndex === 19) {
-                document.getElementById('btn-submit').style.display = 'inline-block';
-            } else {
-                document.getElementById('btn-submit').style.display = 'none';
-            }
-        }
-
-        function selectOption(index) {
-            userAnswers[currentQuestionIndex] = index;
-            renderQuestion(); // Re-render to show selection
-        }
-
-        function showAnswer() {
-            const data = gkData[currentTestId].questions[currentQuestionIndex];
-            const correctOptRaw = data.opts[data.ans];
-            
-            document.getElementById('correct-ans-text').innerHTML = formatCitations(correctOptRaw);
-            document.getElementById('exp-text').innerHTML = formatCitations(data.exp);
-            document.getElementById('explanation-container').classList.add('visible');
-        }
-
-        function nextQuestion() {
-            if (currentQuestionIndex < 19) {
-                currentQuestionIndex++;
-                renderQuestion();
-            }
-        }
-
-        function prevQuestion() {
-            if (currentQuestionIndex > 0) {
-                currentQuestionIndex--;
-                renderQuestion();
-            }
-        }
-
-        function goToQuestion(index) {
-            currentQuestionIndex = index;
-            renderQuestion();
-        }
-
-        function updateNavGrid() {
-            const boxes = document.getElementById('nav-grid').children;
-            for (let i = 0; i < 20; i++) {
-                boxes[i].className = 'nav-box';
-                if (userAnswers[i] !== undefined) boxes[i].classList.add('answered');
-                if (i === currentQuestionIndex) boxes[i].classList.add('active');
-            }
-        }
-
-        function submitTest() {
-            setupFlashcards();
-            switchScreen('screen-flashcards');
-        }
-
-        function setupFlashcards() {
-            const container = document.getElementById('flashcards-container');
-            container.innerHTML = '';
-            const flashcardsData = gkData[currentTestId].flashcards;
-
-            flashcardsData.forEach((fc, i) => {
-                const card = document.createElement('div');
-                card.className = 'flashcard';
-                card.innerHTML = `
-                    <div class="flashcard-inner">
-                        <div class="flashcard-front">
-                            <span class="flashcard-title">Flashcard ${i + 1}</span>
-                            <h3>${formatCitations(fc.q)}</h3>
-                        </div>
-                        <div class="flashcard-back">
-                            <h3 style="font-weight: 500; font-size: 1.1rem; line-height: 1.6;">${formatCitations(fc.a)}</h3>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
+            setTimeout(() => {
+                homeScreen.classList.add('active');
+            }, 50);
         }
     </script>
+
 </body>
 </html>
