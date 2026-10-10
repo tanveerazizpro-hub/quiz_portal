@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Science - Test 4</title>
+    <style>
+        :root { --primary: #2563eb; --primary-hover: #1d4ed8; --success: #16a34a; --danger: #dc2626; --background: #f8fafc; --surface: #ffffff; --text: #0f172a; --text-light: #64748b; }
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--background); color: var(--text); line-height: 1.5; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { max-width: 650px; width: 100%; background: var(--surface); padding: 28px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        h1, h2, h3 { text-align: center; margin-top: 0; } .hidden { display: none !important; }
+        #progress-bar { height: 8px; background: #e2e8f0; border-radius: 4px; margin-bottom: 16px; overflow: hidden; }
+        #progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s ease; }
+        .palette-container { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0; }
+        .palette-title { font-size: 0.85rem; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; text-align: center; }
+        .palette-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(36px, 1fr)); gap: 6px; }
+        .palette-btn { border: 1px solid #cbd5e1; background: #f8fafc; color: var(--text); padding: 6px 0; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.15s ease; }
+        .palette-btn:hover { background: #e2e8f0; } .palette-btn.active { border: 2px solid var(--primary); color: var(--primary); font-weight: 700; }
+        .palette-btn.answered { background-color: var(--primary); color: white; border-color: var(--primary); }
+        .palette-btn.active.answered { outline: 2px solid #0f172a; outline-offset: 1px; }
+        .question-header { font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; }
+        .options-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .option-label { display: flex; align-items: center; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .option-label:hover { background-color: #f1f5f9; } .option-label.correct-bg { background-color: #dcfce7; border-color: var(--success); } .option-label.incorrect-bg { background-color: #fee2e2; border-color: var(--danger); }
+        .option-label input { margin-right: 12px; transform: scale(1.2); }
+        .btn { background-color: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s; width: 100%; margin-bottom: 10px; }
+        .btn:hover { background-color: var(--primary-hover); } .btn-outline { background-color: transparent; color: var(--primary); border: 2px solid var(--primary); } .btn-outline:hover { background-color: #eff6ff; } .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+        .explanation { background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.95rem; border-left: 4px solid var(--primary); }
+        .nav-controls { display: flex; gap: 10px; margin-top: 15px; border-top: 1px solid #e2e8f0; padding-top: 15px; } .nav-controls .btn { margin-bottom: 0; flex: 1; }
+        .flashcard-container { perspective: 1000px; width: 100%; height: 300px; margin: 30px 0; cursor: pointer; }
+        .flashcard { width: 100%; height: 100%; position: relative; transition: transform 0.6s; transform-style: preserve-3d; border-radius: 12px; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); }
+        .flashcard.is-flipped { transform: rotateY(180deg); }
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; border-radius: 12px; font-size: 1.25rem; text-align: center; }
+        .card-front { background-color: var(--primary); color: white; } .card-back { background-color: var(--surface); color: var(--text); border: 2px solid var(--primary); transform: rotateY(180deg); }
+        .flashcard-controls { display: flex; justify-content: space-between; align-items: center; gap: 10px; } .flashcard-controls button { width: auto; flex: 1; }
+        .instruction { text-align: center; color: var(--text-light); font-size: 0.85rem; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="quiz-section">
+        <h2 id="round-title">Science: Test 4 (Space & Earth)</h2>
+        <div id="progress-bar"><div id="progress-fill"></div></div>
+        <div class="palette-container"><div class="palette-title">Question Navigator</div><div class="palette-grid" id="palette-grid"></div></div>
+        <div id="quiz-content">
+            <div class="question-header" id="question-text">Loading question...</div>
+            <div class="instruction" id="question-instruction"></div>
+            <div class="options-grid" id="options-container"></div>
+            <div id="explanation-box" class="explanation hidden"></div>
+            <button id="submit-btn" class="btn" onclick="submitAnswer()">Submit Answer</button>
+            <button id="show-answer-btn" class="btn btn-outline" onclick="showAnswer()">Show Answer & Explanation</button>
+            <div class="nav-controls">
+                <button id="prev-btn" class="btn btn-outline" onclick="prevQuestion()">← Previous</button>
+                <button id="finish-btn" class="btn btn-outline" style="background:#16a34a;color:white;border-color:#16a34a;" onclick="finishQuiz()">Finish Quiz</button>
+                <button id="next-btn" class="btn btn-outline" onclick="nextQuestion()">Next →</button>
+            </div>
+        </div>
+        <div id="quiz-results" class="hidden">
+            <h2>Quiz Complete!</h2>
+            <h1 id="final-score">0 / 20</h1>
+            <p style="text-align: center; margin-bottom: 25px;">Review finished! Proceed below to study the high-yield facts.</p>
+            <button class="btn" onclick="startFlashcards()">Proceed to Topic Facts Flashcards</button>
+            <button class="btn btn-outline" onclick="reviewQuestions()">Review Questions</button>
+        </div>
+    </div>
+    <div id="flashcard-section" class="hidden">
+        <h2>Topic Facts Flashcards</h2>
+        <p class="instruction">Click or tap the card to flip between the Topic and the Fact.</p>
+        <div class="flashcard-container" onclick="flipCard()"><div class="flashcard" id="flashcard"><div class="card-face card-front" id="card-front">Topic</div><div class="card-face card-back" id="card-back">Fact</div></div></div>
+        <p style="text-align: center; font-weight: bold;" id="card-counter">1 / 5</p>
+        <div class="flashcard-controls">
+            <button class="btn btn-outline" onclick="prevCard()">Previous</button>
+            <button class="btn btn-outline" onclick="nextCard()">Next</button>
+        </div>
+        <a href="index.html" style="text-decoration:none;"><button class="btn" style="margin-top: 20px;">Back to Main Menu</button></a>
+    </div>
+</div>
+<script>
+    const quizData = [
+        { round: "Test 4", text: "Which planet has the shortest orbital period around the Sun?", type: "single", options: ["Venus", "Mercury", "Earth", "Mars"], correct: [1], exp: "Mercury is closest to the Sun and completes one orbit in about 88 Earth days, the shortest planetary year.[span_74](start_span)[span_74](end_span)" },
+        { round: "Test 4", text: "Why do we see phases of the Moon?", type: "single", options: ["Earth's shadow covers the Moon every night", "We see changing portions of the Moon's sunlit half as it orbits Earth", "The Moon changes shape", "The Moon produces different amounts of light"], correct: [1], exp: "The Moon is always roughly half illuminated by the Sun. Its position relative to Earth and Sun changes the visible illuminated fraction.[span_75](start_span)[span_75](end_span)" },
+        { round: "Test 4", text: "A light-year is a unit of:", type: "single", options: ["Time", "Brightness", "Distance", "Mass"], correct: [2], exp: "A light-year is the distance light travels in one year, about 9.46 trillion kilometres.[span_76](start_span)[span_76](end_span)" },
+        { round: "Test 4", text: "Which object is a natural satellite of Earth?", type: "single", options: ["Mars", "The Moon", "Venus", "The Sun"], correct: [1], exp: "Earth's Moon is its natural satellite and orbits Earth.[span_77](start_span)[span_77](end_span)" },
+        { round: "Test 4", text: "What powers the Sun's energy production?", type: "single", options: ["Chemical combustion", "Nuclear fission", "Nuclear fusion of hydrogen nuclei", "Friction with space"], correct: [2], exp: "In the Sun's core, hydrogen nuclei fuse into helium under extreme temperature and pressure, releasing energy.[span_78](start_span)[span_78](end_span)" },
+        { round: "Test 4", text: "Which layer of Earth's atmosphere contains most of the ozone layer?", type: "single", options: ["Troposphere", "Stratosphere", "Mesosphere", "Thermosphere"], correct: [1], exp: "Most atmospheric ozone is concentrated in the stratosphere, where it absorbs much of the Sun's harmful ultraviolet radiation.[span_79](start_span)[span_79](end_span)" },
+        { round: "Test 4", text: "Which rock type forms when molten rock cools and solidifies?", type: "single", options: ["Sedimentary", "Metamorphic", "Igneous", "Organic"], correct: [2], exp: "Igneous rocks form from cooling magma or lava. Granite and basalt are common examples.[span_80](start_span)[span_80](end_span)" },
+        { round: "Test 4", text: "Which process turns loose sediments into sedimentary rock over long periods?", type: "single", options: ["Lithification", "Photosynthesis", "Sublimation", "Nuclear fusion"], correct: [0], exp: "Lithification involves compaction and cementation of sediments, turning loose deposits into sedimentary rock.[span_81](start_span)[span_81](end_span)" },
+        { round: "Test 4", text: "Which instrument records earthquake vibrations?", type: "single", options: ["Barometer", "Seismograph", "Hygrometer", "Anemometer"], correct: [1], exp: "A seismograph/seismometer detects and records ground motion caused by earthquakes and other vibrations.[span_82](start_span)[span_82](end_span)" },
+        { round: "Test 4", text: "Air pressure is commonly measured using a:", type: "single", options: ["Barometer", "Thermometer", "Ammeter", "Calorimeter"], correct: [0], exp: "A barometer measures atmospheric pressure. Mercury and aneroid barometers are traditional types.[span_83](start_span)[span_83](end_span)" },
+        { round: "Test 4", text: "Which gas is the largest contributor to Earth's natural greenhouse effect?", type: "single", options: ["Water vapour", "Oxygen", "Helium", "Neon"], correct: [0], exp: "Water vapour is the most abundant greenhouse gas and a major contributor to Earth's natural greenhouse effect.[span_84](start_span)[span_84](end_span)" },
+        { round: "Test 4", text: "Why does deforestation often increase soil erosion?", type: "single", options: ["Tree roots no longer help hold soil together", "Trees increase wind speed everywhere", "Soil becomes magnetic", "Rain stops completely"], correct: [0], exp: "Roots bind soil and vegetation slows surface runoff. Removing them can leave soil more exposed to wind and flowing water.[span_85](start_span)[span_85](end_span)" },
+        { round: "Test 4", text: "In an ecosystem, decomposers are important because they:", type: "single", options: ["Produce sunlight", "Recycle nutrients from dead organisms and waste", "Stop all predation", "Eliminate all bacteria"], correct: [1], exp: "Fungi and many bacteria decompose organic matter, returning nutrients to soil and water for reuse.[span_86](start_span)[span_86](end_span)" },
+        { round: "Test 4", text: "Which level of biodiversity refers specifically to variation among different species?", type: "single", options: ["Genetic diversity", "Species diversity", "Ecosystem diversity", "Molecular diversity"], correct: [1], exp: "Species diversity describes the variety and relative abundance of species in a community or region.[span_87](start_span)[span_87](end_span)" },
+        { round: "Test 4", text: "Which scientist is associated with the three laws of planetary motion?", type: "single", options: ["Galileo Galilei", "Johannes Kepler", "Isaac Newton", "Albert Einstein"], correct: [1], exp: "Johannes Kepler formulated three laws describing planetary orbits from astronomical observations, especially those of Tycho Brahe.[span_88](start_span)[span_88](end_span)" },
+        { round: "Test 4", text: "Who discovered penicillin, leading to one of the first widely used antibiotics?", type: "single", options: ["Alexander Fleming", "Gregor Mendel", "Dmitri Mendeleev", "Ernest Rutherford"], correct: [0], exp: "Alexander Fleming observed in 1928 that a mold produced a substance that inhibited bacterial growth; this became the basis for penicillin.[span_89](start_span)[span_89](end_span)" },
+        { round: "Test 4", text: "Which instrument is used to measure electric current in a circuit?", type: "single", options: ["Voltmeter", "Ammeter", "Galvanometer only for temperature", "Barometer"], correct: [1], exp: "An ammeter measures electric current, usually in amperes (A). It is connected in series in a simple circuit.[span_90](start_span)[span_90](end_span)" },
+        { round: "Test 4", text: "Which invention is most directly associated with Louis Braille?", type: "single", options: ["A tactile reading and writing system", "The electric motor", "The telephone", "The steam engine"], correct: [0], exp: "Louis Braille developed a raised-dot system that allows people who are blind or visually impaired to read and write by touch.[span_91](start_span)[span_91](end_span)" },
+        { round: "Test 4", text: "Which technology uses electromagnetic waves with wavelengths shorter than visible light to create images of bones?", type: "single", options: ["Infrared imaging", "X-ray imaging", "Radio broadcasting", "Ultrasound"], correct: [1], exp: "X-rays are high-energy electromagnetic waves that penetrate soft tissue more readily than bone, creating useful medical images.[span_92](start_span)[span_92](end_span)" },
+        { round: "Test 4", text: "Which statement about Earth's seasons is most accurate?", type: "single", options: ["Seasons are caused mainly by Earth's changing distance from the Sun", "Seasons are caused mainly by Earth's axial tilt as it orbits the Sun", "Seasons occur because the Sun changes size every year", "Seasons are caused by lunar phases"], correct: [1], exp: "Earth's axis is tilted about 23.5°. As Earth orbits the Sun, this tilt changes the angle and duration of sunlight received by each hemisphere.[span_93](start_span)[span_93](end_span)" }
+    ];
+
+    const flashcardsData = [
+        { topic: "What instrument records earthquakes?", fact: "A seismograph/seismometer records ground motion.[span_94](start_span)[span_94](end_span)" },
+        { topic: "What do decomposers do?", fact: "Break down dead matter and recycle nutrients into ecosystems.[span_95](start_span)[span_95](end_span)" },
+        { topic: "What causes Earth's seasons?", fact: "Earth's ~23.5° axial tilt as it orbits the Sun.[span_96](start_span)[span_96](end_span)" },
+        { topic: "Who developed the laws of planetary motion?", fact: "Johannes Kepler.[span_97](start_span)[span_97](end_span)" },
+        { topic: "What did Fleming discover?", fact: "Penicillin's antibacterial effect, opening the path to a major antibiotic.[span_98](start_span)[span_98](end_span)" }
+    ];
+
+    const userAnswers = Array(quizData.length).fill(null).map(() => ({ selected: [], submitted: false, revealed: false, isCorrect: false }));
+    let currentQ = 0; let currentFact = 0;
+    const qTitle = document.getElementById("round-title"), qText = document.getElementById("question-text"), qInst = document.getElementById("question-instruction"), optionsContainer = document.getElementById("options-container"), expBox = document.getElementById("explanation-box"), submitBtn = document.getElementById("submit-btn"), showAnsBtn = document.getElementById("show-answer-btn"), prevBtn = document.getElementById("prev-btn"), nextBtn = document.getElementById("next-btn"), progressFill = document.getElementById("progress-fill"), paletteGrid = document.getElementById("palette-grid");
+
+    function initPalette() { paletteGrid.innerHTML = ""; quizData.forEach((_, idx) => { const btn = document.createElement("button"); btn.className = "palette-btn"; btn.id = `palette-btn-${idx}`; btn.innerText = idx + 1; btn.onclick = () => jumpToQuestion(idx); paletteGrid.appendChild(btn); }); }
+    function updatePalette() { quizData.forEach((_, idx) => { const btn = document.getElementById(`palette-btn-${idx}`); btn.classList.toggle("active", idx === currentQ); btn.classList.toggle("answered", userAnswers[idx].submitted || userAnswers[idx].revealed); }); }
+    function loadQuestion() { const q = quizData[currentQ]; const state = userAnswers[currentQ]; qTitle.innerText = `${q.round} (Question ${currentQ + 1} of ${quizData.length})`; qText.innerText = q.text; qInst.innerText = q.type === "multi" ? "Select multiple answers:" : "Select one answer:"; progressFill.style.width = `${(userAnswers.filter(a => a.submitted || a.revealed).length / quizData.length) * 100}%`; optionsContainer.innerHTML = ""; expBox.innerHTML = `<strong>Explanation:</strong> ${q.exp}`; prevBtn.disabled = (currentQ === 0); nextBtn.disabled = (currentQ === quizData.length - 1); q.options.forEach((opt, index) => { const label = document.createElement("label"); label.className = "option-label"; label.id = `label-${index}`; const input = document.createElement("input"); input.type = q.type === "multi" ? "checkbox" : "radio"; input.name = "quiz-option"; input.value = index; input.checked = state.selected.includes(index); input.disabled = (state.submitted || state.revealed); input.onchange = () => { state.selected = getSelectedInputs(); }; label.appendChild(input); label.appendChild(document.createTextNode(opt)); optionsContainer.appendChild(label); }); if (state.submitted || state.revealed) { highlightAnswers(); expBox.classList.remove("hidden"); submitBtn.classList.add("hidden"); showAnsBtn.classList.add("hidden"); } else { expBox.classList.add("hidden"); submitBtn.classList.remove("hidden"); showAnsBtn.classList.remove("hidden"); } updatePalette(); }
+    function getSelectedInputs() { return Array.from(document.querySelectorAll('input[name="quiz-option"]:checked')).map(i => parseInt(i.value)); }
+    function highlightAnswers() { const q = quizData[currentQ]; const state = userAnswers[currentQ]; q.options.forEach((_, i) => { const lbl = document.getElementById(`label-${i}`); if (q.correct.includes(i)) { lbl.classList.add("correct-bg"); } else if (state.selected.includes(i)) { lbl.classList.add("incorrect-bg"); } }); }
+    function lockQuestion(revealedOnly = false) { const q = quizData[currentQ]; const state = userAnswers[currentQ]; state.selected = getSelectedInputs(); if (revealedOnly) { state.revealed = true; state.isCorrect = false; } else { state.submitted = true; state.isCorrect = ([...q.correct].sort().join(",") === [...state.selected].sort().join(",")); } document.querySelectorAll('input[name="quiz-option"]').forEach(i => i.disabled = true); highlightAnswers(); expBox.classList.remove("hidden"); submitBtn.classList.add("hidden"); showAnsBtn.classList.add("hidden"); updatePalette(); progressFill.style.width = `${(userAnswers.filter(a => a.submitted || a.revealed).length / quizData.length) * 100}%`; }
+    function submitAnswer() { if (getSelectedInputs().length === 0) { alert("Please select an answer first."); return; } lockQuestion(false); }
+    function showAnswer() { lockQuestion(true); }
+    function jumpToQuestion(idx) { currentQ = idx; loadQuestion(); }
+    function nextQuestion() { if (currentQ < quizData.length - 1) { currentQ++; loadQuestion(); } }
+    function prevQuestion() { if (currentQ > 0) { currentQ--; loadQuestion(); } }
+    function finishQuiz() { document.getElementById("quiz-content").classList.add("hidden"); document.getElementById("progress-bar").classList.add("hidden"); document.getElementById("round-title").classList.add("hidden"); document.querySelector(".palette-container").classList.add("hidden"); document.getElementById("quiz-results").classList.remove("hidden"); document.getElementById("final-score").innerText = `${userAnswers.filter(a => a.isCorrect).length} / ${quizData.length}`; }
+    function reviewQuestions() { document.getElementById("quiz-results").classList.add("hidden"); document.getElementById("quiz-content").classList.remove("hidden"); document.getElementById("progress-bar").classList.remove("hidden"); document.getElementById("round-title").classList.remove("hidden"); document.querySelector(".palette-container").classList.remove("hidden"); currentQ = 0; loadQuestion(); }
+    function startFlashcards() { document.getElementById("quiz-section").classList.add("hidden"); document.getElementById("flashcard-section").classList.remove("hidden"); loadFact(); }
+    function loadFact() { const f = flashcardsData[currentFact]; document.getElementById("card-front").innerText = f.topic; document.getElementById("card-back").innerText = f.fact; document.getElementById("card-counter").innerText = `${currentFact + 1} / ${flashcardsData.length}`; document.getElementById("flashcard").classList.remove("is-flipped"); }
+    function flipCard() { document.getElementById("flashcard").classList.toggle("is-flipped"); }
+    function nextCard() { currentFact = (currentFact + 1) % flashcardsData.length; loadFact(); }
+    function prevCard() { currentFact = (currentFact - 1 + flashcardsData.length) % flashcardsData.length; loadFact(); }
+    initPalette(); loadQuestion();
+</script>
+</body>
+</html>
