@@ -107,7 +107,7 @@
             color: white;
         }
 
-        /* Secondary Buttons (For Tests) */
+        /* Secondary Buttons (For Tests) - Updated for Anchor Tags */
         .test-btn {
             background: white;
             border: 1px solid #e1e8ed;
@@ -118,6 +118,10 @@
             cursor: pointer;
             transition: all 0.2s ease;
             box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            text-decoration: none; /* Prevents underline on links */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .test-btn:hover {
@@ -181,11 +185,8 @@
             <h2 id="dynamic-subject-title">Subject Name</h2>
             <p class="subtitle">Select a test module to start</p>
             
-            <div class="grid-container">
-                <button class="test-btn">Test 1</button>
-                <button class="test-btn">Test 2</button>
-                <button class="test-btn">Test 3</button>
-                <button class="test-btn">Test 4</button>
+            <div class="grid-container" id="test-buttons-container">
+                <!-- Test links will be injected here dynamically by JavaScript -->
             </div>
 
             <button class="btn-back" onclick="goBack()">← Back to Subjects</button>
@@ -198,11 +199,44 @@
         const homeScreen = document.getElementById('home-screen');
         const testsScreen = document.getElementById('tests-screen');
         const subjectTitle = document.getElementById('dynamic-subject-title');
+        const testButtonsContainer = document.getElementById('test-buttons-container');
+
+        // File routing logic for different subjects
+        const subjectRoutes = {
+            'General Knowledge': ['gk_test1.html', 'gk_test2.html', 'gk_test3.html', 'gk_test4.html'],
+            'Mathematics': ['#', '#', '#', '#'], // Placeholders until math tests are created
+            'Science': ['#', '#', '#', '#']      // Placeholders until science tests are created
+        };
 
         // Function to open the tests screen for a specific subject
         function openSubject(subjectName) {
             // Update the title
             subjectTitle.textContent = subjectName;
+            
+            // Clear previous buttons
+            testButtonsContainer.innerHTML = '';
+
+            // Generate the 4 test links dynamically based on the selected subject
+            const routes = subjectRoutes[subjectName];
+            for (let i = 0; i < 4; i++) {
+                const a = document.createElement('a');
+                a.className = 'test-btn';
+                a.textContent = `Test ${i + 1}`;
+                
+                if (routes[i] === '#') {
+                    // If it's a placeholder, prevent default linking and show an alert
+                    a.href = '#';
+                    a.onclick = (e) => {
+                        e.preventDefault();
+                        alert(`${subjectName} modules are currently under construction!`);
+                    };
+                } else {
+                    // Link directly to the specific HTML file
+                    a.href = routes[i];
+                }
+                
+                testButtonsContainer.appendChild(a);
+            }
             
             // Hide Home, Show Tests
             homeScreen.classList.remove('active');
