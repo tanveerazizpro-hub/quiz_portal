@@ -24,6 +24,13 @@
             max-width: 500px;
             width: 100%;
         }
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 25px;
+            align-items: center;
+        }
         .btn {
             display: inline-block;
             background-color: #2563eb;
@@ -35,7 +42,7 @@
             font-weight: bold;
             transition: background 0.2s;
             width: 80%;
-            margin-top: 20px;
+            box-sizing: border-box;
         }
         .btn:hover { background-color: #1d4ed8; }
     </style>
@@ -45,7 +52,11 @@
 <div class="menu-container">
     <h1>Inter-School Quiz Championship: Class 8–12</h1>
     <p>Select a test below to begin playing.</p>
-    <a href="test1.html" class="btn">Test 1</a>
+    
+    <div class="btn-group">
+        <a href="test1.html" class="btn">Test 1</a>
+        <a href="test2.html" class="btn">Test 2</a>
+    </div>
 </div>
 
 </body>
