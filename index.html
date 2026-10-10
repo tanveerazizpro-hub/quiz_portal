@@ -499,9 +499,9 @@
     </div>
 
     <script>
-        // Data Parser Helper: Formats citations nicely
+        // Data Parser Helper: Formats citations nicely (FIXED SYNTAX ERROR)
         function formatCitations(text) {
-            return text.replace(/(\)/g, '<span class="citation">$1</span>');
+            return text.replace(/\[cite:\s*([^\]]+)\]/g, '<span class="citation">Source $1</span>');
         }
 
         // Quiz Database mapped exactly to provided documents
