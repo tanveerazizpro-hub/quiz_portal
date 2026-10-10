@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>General Knowledge - Test 4</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary-color: #4a90e2; --bg-gradient-start: #f5f7fa; --bg-gradient-end: #c3cfe2; --text-dark: #2c3e50; --card-bg: rgba(255, 255, 255, 0.95); --correct-color: #27ae60; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%); min-height: 100vh; padding: 40px 20px; color: var(--text-dark); }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 { font-size: 2.5rem; color: var(--primary-color); }
+        .btn-back { display: inline-block; margin-bottom: 20px; text-decoration: none; color: var(--text-dark); border: 2px solid #cbd5e1; padding: 8px 20px; border-radius: 20px; transition: all 0.3s; }
+        .btn-back:hover { background: var(--text-dark); color: white; }
+        .q-card { background: var(--card-bg); border-radius: 15px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .q-text { font-size: 1.2rem; font-weight: 600; margin-bottom: 15px; }
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        .opt-btn { text-align: left; padding: 12px 20px; border: 1px solid #e2e8f0; border-radius: 10px; background: white; cursor: pointer; transition: 0.2s; font-size: 1rem; }
+        .opt-btn:hover { border-color: var(--primary-color); background: #f0f7ff; }
+        .explanation { display: none; margin-top: 15px; padding: 15px; background: #e8f5e9; border-left: 4px solid var(--correct-color); border-radius: 4px; color: #1b5e20; }
+        .explanation.show { display: block; animation: fadeIn 0.4s; }
+        .flashcards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 40px; }
+        .flashcard { background: transparent; perspective: 1000px; height: 150px; cursor: pointer; }
+        .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .flashcard-front { background: var(--primary-color); color: white; font-weight: 500; }
+        .flashcard-back { background: var(--correct-color); color: white; transform: rotateY(180deg); font-size: 0.95rem; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="btn-back">← Back to Portal</a>
+        <div class="header">
+            <h1>Test 4: General Knowledge</h1>
+        </div>
+        <div id="quiz-feed"></div>
+        <div class="header" style="margin-top: 50px;">
+            <h2>Quick-Revision Flashcards</h2>
+        </div>
+        <div class="flashcards-grid" id="fc-feed"></div>
+    </div>
+    <script>
+        const data = [
+            {q: '1. Which international agreement aims to protect the ozone layer?', opts: ['A. Kyoto Protocol', 'B. Montreal Protocol', 'C. Paris Agreement', 'D. Ramsar Convention'], ans: 1, exp: 'The Montreal Protocol controls ozone-depleting substances.[span_76](start_span)[span_76](end_span)'},
+            {q: '2. Which Indian freedom movement began with Gandhi\'s Dandi March in 1930?', opts: ['A. Quit India Movement', 'B. Civil Disobedience Movement', 'C. Swadeshi Movement', 'D. Champaran Satyagraha'], ans: 1, exp: 'The Dandi March launched a major phase of the Civil Disobedience Movement.[span_77](start_span)[span_77](end_span)'},
+            {q: '3. Which is the only country that lies in all four hemispheres?', opts: ['A. Indonesia', 'B. Kiribati', 'C. Ecuador', 'D. Maldives'], ans: 1, exp: 'Kiribati spans the Equator and both sides of the 180° meridian.[span_78](start_span)[span_78](end_span)'},
+            {q: '4. Which empire built the road network known as the Royal Road in the ancient Near East?', opts: ['A. Roman Empire', 'B. Achaemenid Persian Empire', 'C. Ottoman Empire', 'D. Byzantine Empire'], ans: 1, exp: 'The Achaemenid Persians developed the Royal Road to aid communication and administration.[span_79](start_span)[span_79](end_span)'},
+            {q: '5. Who was the first Indian woman to win the Booker Prize?', opts: ['A. Kiran Desai', 'B. Arundhati Roy', 'C. Jhumpa Lahiri', 'D. Anita Desai'], ans: 1, exp: 'Arundhati Roy won the Booker Prize in 1997 for "The God of Small Things".[span_80](start_span)[span_80](end_span)'},
+            {q: '6. Which Indian state is home to the Keibul Lamjao, the world\'s only floating national park?', opts: ['A. Assam', 'B. Manipur', 'C. Meghalaya', 'D. Sikkim'], ans: 1, exp: 'Keibul Lamjao National Park is on Loktak Lake in Manipur.[span_81](start_span)[span_81](end_span)'},
+            {q: '7. Which is the largest moon of Saturn?', opts: ['A. Enceladus', 'B. Titan', 'C. Rhea', 'D. Iapetus'], ans: 1, exp: 'Titan is Saturn\'s largest moon.[span_82](start_span)[span_82](end_span)'},
+            {q: '8. Which Indian musician became the first musician to receive the Bharat Ratna?', opts: ['A. Ravi Shankar', 'B. M. S. Subbulakshmi', 'C. Lata Mangeshkar', 'D. Bismillah Khan'], ans: 1, exp: 'M. S. Subbulakshmi received the Bharat Ratna in 1998, before other musicians listed here.[span_83](start_span)[span_83](end_span)'},
+            {q: '9. Which country is associated with the ancient city of Carthage?', opts: ['A. Greece', 'B. Tunisia', 'C. Libya', 'D. Morocco'], ans: 1, exp: 'Carthage was an ancient city near modern Tunis, Tunisia.[span_84](start_span)[span_84](end_span)'},
+            {q: '10. Which Indian constitutional body conducts elections to Parliament and state legislatures?', opts: ['A. UPSC', 'B. Election Commission of India', 'C. Finance Commission', 'D. NITI Aayog'], ans: 1, exp: 'The Election Commission of India administers elections to Parliament and state legislatures.[span_85](start_span)[span_85](end_span)'},
+            {q: '11. Which strait connects the Persian Gulf with the Gulf of Oman?', opts: ['A. Bab-el-Mandeb', 'B. Strait of Hormuz', 'C. Sunda Strait', 'D. Taiwan Strait'], ans: 1, exp: 'The Strait of Hormuz is a key passage between the Persian Gulf and Gulf of Oman.[span_86](start_span)[span_86](end_span)'},
+            {q: '12. Which scientist proposed the uncertainty principle?', opts: ['A. Niels Bohr', 'B. Werner Heisenberg', 'C. Max Planck', 'D. Erwin Schrödinger'], ans: 1, exp: 'Werner Heisenberg formulated the uncertainty principle.[span_87](start_span)[span_87](end_span)'},
+            {q: '13. Which is the largest gland in the human body?', opts: ['A. Pancreas', 'B. Liver', 'C. Thyroid', 'D. Pituitary'], ans: 1, exp: 'The liver is the largest gland in the human body.[span_88](start_span)[span_88](end_span)'},
+            {q: '14. Which country\'s national legislature is called the Diet?', opts: ['A. China', 'B. Japan', 'C. South Korea', 'D. Thailand'], ans: 1, exp: 'Japan\'s national legislature is called the National Diet.[span_89](start_span)[span_89](end_span)'},
+            {q: '15. Which Indian state is famous for the classical dance form Mohiniyattam?', opts: ['A. Tamil Nadu', 'B. Kerala', 'C. Andhra Pradesh', 'D. Odisha'], ans: 1, exp: 'Mohiniyattam is a classical dance form from Kerala.[span_90](start_span)[span_90](end_span)'},
+            {q: '16. What is the world\'s largest active volcano by volume and area?', opts: ['A. Mount Etna', 'B. Mauna Loa', 'C. Mount Fuji', 'D. Mount Vesuvius'], ans: 1, exp: 'Mauna Loa in Hawaii is generally described as the largest active volcano by volume and area.[span_91](start_span)[span_91](end_span)'},
+            {q: '17. Which Indian scientist is known for the Raman Effect?', opts: ['A. Homi J. Bhabha', 'B. C. V. Raman', 'C. S. N. Bose', 'D. Vikram Sarabhai'], ans: 1, exp: 'C. V. Raman discovered the light-scattering effect that bears his name.[span_92](start_span)[span_92](end_span)'},
+            {q: '18. Which international organisation is responsible for setting global civil aviation standards?', opts: ['A. IMO', 'B. ICAO', 'C. IAEA', 'D. ITU'], ans: 1, exp: 'The International Civil Aviation Organization develops international civil aviation standards.[span_93](start_span)[span_93](end_span)'},
+            {q: '19. Which river is known as the "Sorrow of Bihar" because of recurring floods?', opts: ['A. Gandak', 'B. Kosi', 'C. Son', 'D. Damodar'], ans: 1, exp: 'The Kosi River is often called the Sorrow of Bihar.[span_94](start_span)[span_94](end_span)'},
+            {q: '20. Which country hosted the first modern Olympic Games in 1896?', opts: ['A. France', 'B. Greece', 'C. United Kingdom', 'D. Italy'], ans: 1, exp: 'The first modern Olympics were held in Athens, Greece, in 1896.[span_95](start_span)[span_95](end_span)'}
+        ];
+        const flashcards = [
+            {q: 'What is the capital of Kyrgyzstan?', a: 'Bishkek.[span_96](start_span)[span_96](end_span)'},
+            {q: 'Which Indian scientist won the Nobel Prize in Physics in 1930?', a: 'C. V. Raman.[span_97](start_span)[span_97](end_span)'},
+            {q: 'What is the study of coins called?', a: 'Numismatics.[span_98](start_span)[span_98](end_span)'},
+            {q: 'Which treaty established the European Union in its modern form?', a: 'The Maastricht Treaty, signed in 1992.[span_99](start_span)[span_99](end_span)'},
+            {q: 'Which is the largest planet in our Solar System?', a: 'Jupiter.[span_100](start_span)[span_100](end_span)'}
+        ];
+
+        const feed = document.getElementById('quiz-feed');
+        data.forEach((item, index) => {
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            let optsHtml = item.opts.map((opt) => `<button class="opt-btn" onclick="reveal(${index})">${opt}</button>`).join('');
+            card.innerHTML = `<div class="q-text">${item.q}</div><div class="options">${optsHtml}</div><div class="explanation" id="exp-${index}"><strong>Correct Answer: ${item.opts[item.ans]}</strong><br><br>${item.exp}</div>`;
+            feed.appendChild(card);
+        });
+
+        const fcFeed = document.getElementById('fc-feed');
+        flashcards.forEach((fc) => {
+            fcFeed.innerHTML += `<div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner"><div class="flashcard-front">${fc.q}</div><div class="flashcard-back">${fc.a}</div></div></div>`;
+        });
+        function reveal(id) { document.getElementById(`exp-${id}`).classList.add('show'); }
+    </script>
+</body>
+</html>
